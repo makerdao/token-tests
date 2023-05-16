@@ -75,18 +75,18 @@ contract TokenTests is Test {
     bytes32 constant PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
-    function checkPermit(address token) internal {
-        checkPermitEOA(token);
-        checkPermitContract(token);
-        checkPermitContractInvalidSignature(token);
-        checkPermitBadNonce(token);
-        checkPermitBadDeadline(token);
-        checkPermitPastDeadline(token);
-        checkPermitOwnerZero(token);
-        checkPermitReplay(token);
+    function checkPermit(address _token, string memory _contractName) internal {
+        checkPermitEOA(_token);
+        checkPermitContract(_token);
+        checkPermitContractInvalidSignature(_token, _contractName);
+        checkPermitBadNonce(_token, _contractName);
+        checkPermitBadDeadline(_token, _contractName);
+        checkPermitPastDeadline(_token, _contractName);
+        checkPermitOwnerZero(_token, _contractName);
+        checkPermitReplay(_token, _contractName);
     }
 
-    function checkPermitEOA(address token) internal {
+    function checkPermitEOA(address _token) internal {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
@@ -95,7 +95,7 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, 0, block.timestamp))
                 )
             )
@@ -103,13 +103,13 @@ contract TokenTests is Test {
 
         vm.expectEmit(true, true, true, true);
         emit Approval(owner, address(0xCAFE), 1e18);
-        TokenLike(token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
+        TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
 
-        assertEq(TokenLike(token).allowance(owner, address(0xCAFE)), 1e18);
-        assertEq(TokenLike(token).nonces(owner), 1);
+        assertEq(TokenLike(_token).allowance(owner, address(0xCAFE)), 1e18);
+        assertEq(TokenLike(_token).nonces(owner), 1);
     }
 
-    function checkPermitContract(address token) internal {
+    function checkPermitContract(address _token) internal {
         uint256 privateKey1 = 0xBEEF;
         address signer1 = vm.addr(privateKey1);
         uint256 privateKey2 = 0xBEEE;
@@ -122,7 +122,7 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, mockMultisig, address(0xCAFE), 1e18, 0, block.timestamp))
                 )
             )
@@ -133,7 +133,7 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, mockMultisig, address(0xCAFE), 1e18, 0, block.timestamp))
                 )
             )
@@ -142,13 +142,13 @@ contract TokenTests is Test {
         bytes memory signature = abi.encode(r, s, bytes32(uint256(v) << 248), r2, s2, bytes32(uint256(v2) << 248));
         vm.expectEmit(true, true, true, true);
         emit Approval(mockMultisig, address(0xCAFE), 1e18);
-        TokenLike(token).permit(mockMultisig, address(0xCAFE), 1e18, block.timestamp, signature);
+        TokenLike(_token).permit(mockMultisig, address(0xCAFE), 1e18, block.timestamp, signature);
 
-        assertEq(TokenLike(token).allowance(mockMultisig, address(0xCAFE)), 1e18);
-        assertEq(TokenLike(token).nonces(mockMultisig), 1);
+        assertEq(TokenLike(_token).allowance(mockMultisig, address(0xCAFE)), 1e18);
+        assertEq(TokenLike(_token).nonces(mockMultisig), 1);
     }
 
-    function checkPermitContractInvalidSignature(address token) public {
+    function checkPermitContractInvalidSignature(address _token, string memory _contractName) public {
         uint256 privateKey1 = 0xBEEF;
         address signer1 = vm.addr(privateKey1);
         uint256 privateKey2 = 0xBEEE;
@@ -161,7 +161,7 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, mockMultisig, address(0xCAFE), 1e18, 0, block.timestamp))
                 )
             )
@@ -172,18 +172,18 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, mockMultisig, address(0xCAFE), 1e18, 0, block.timestamp))
                 )
             )
         );
 
         bytes memory signature = abi.encode(r, s, bytes32(uint256(v) << 248), r2, s2, bytes32(uint256(v2) << 248));
-        vm.expectRevert(); // TODO: check that revert reason matches ".+\/invalid-permit"
-        TokenLike(token).permit(mockMultisig, address(0xCAFE), 1e18, block.timestamp, signature);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-permit"));
+        TokenLike(_token).permit(mockMultisig, address(0xCAFE), 1e18, block.timestamp, signature);
     }
 
-    function checkPermitBadNonce(address token) public {
+    function checkPermitBadNonce(address _token, string memory _contractName) public {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
@@ -192,17 +192,17 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, 12345, block.timestamp))
                 )
             )
         );
 
-        vm.expectRevert();  // TODO: check that revert reason matches ".+\/invalid-permit"
-        TokenLike(token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-permit"));
+        TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
     }
 
-    function checkPermitBadDeadline(address token) public {
+    function checkPermitBadDeadline(address _token, string memory _contractName) public {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
@@ -211,22 +211,22 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, 0, block.timestamp))
                 )
             )
         );
 
-        vm.expectRevert();  // TODO: check that revert reason matches ".+\/invalid-permit"
-        TokenLike(token).permit(owner, address(0xCAFE), 1e18, block.timestamp + 1, v, r, s);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-permit"));
+        TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp + 1, v, r, s);
     }
 
-    function checkPermitPastDeadline(address token) public {
+    function checkPermitPastDeadline(address _token, string memory _contractName) public {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
         uint256 deadline = block.timestamp;
 
-        bytes32 domain_separator = TokenLike(token).DOMAIN_SEPARATOR();
+        bytes32 domain_separator = TokenLike(_token).DOMAIN_SEPARATOR();
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
@@ -240,16 +240,16 @@ contract TokenTests is Test {
 
         vm.warp(deadline + 1);
 
-        vm.expectRevert();  // TODO: check that revert reason matches ".+\/permit-expired"
-        TokenLike(token).permit(owner, address(0xCAFE), 1e18, deadline, v, r, s);
+        vm.expectRevert(abi.encodePacked(_contractName, "/permit-expired"));
+        TokenLike(_token).permit(owner, address(0xCAFE), 1e18, deadline, v, r, s);
     }
 
-    function checkPermitOwnerZero(address token) public {
-        vm.expectRevert(); // TODO: check that revert reason matches ".+\/invalid-owner"
-        TokenLike(token).permit(address(0), address(0xCAFE), 1e18, block.timestamp, 28, bytes32(0), bytes32(0));
+    function checkPermitOwnerZero(address _token, string memory _contractName) public {
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-owner"));
+        TokenLike(_token).permit(address(0), address(0xCAFE), 1e18, block.timestamp, 28, bytes32(0), bytes32(0));
     }
 
-    function checkPermitReplay(address token) public {
+    function checkPermitReplay(address _token, string memory _contractName) public {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
@@ -258,14 +258,14 @@ contract TokenTests is Test {
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    TokenLike(token).DOMAIN_SEPARATOR(),
-                    keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, TokenLike(token).nonces(owner), block.timestamp))
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
+                    keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, TokenLike(_token).nonces(owner), block.timestamp))
                 )
             )
         );
 
-        TokenLike(token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
-        vm.expectRevert(); // TODO: check that revert reason matches ".+\/invalid-permit"
-        TokenLike(token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
+        TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-permit"));
+        TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
     }
 }
