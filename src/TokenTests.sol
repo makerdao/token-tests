@@ -15,12 +15,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 pragma solidity >=0.8.0;
 
-import "forge-std/Test.sol";
+import "dss-test/DssTest.sol";
 
 interface TokenLike {
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
+    function version() external view returns (string memory);
+    function decimals() external view returns (uint8);
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address) external view returns (uint256);
     function allowance(address, address) external view returns (uint256);
+    function approve(address, uint256) external returns (bool);
+    function transfer(address, uint256) external returns (bool);
+    function transferFrom(address, address, uint256) external returns (bool);
+    function increaseAllowance(address, uint256) external returns (bool);
+    function decreaseAllowance(address, uint256) external returns (bool);
     function DOMAIN_SEPARATOR() external view returns (bytes32);
     function nonces(address) external view returns (uint256);
+    function mint(address, uint256) external returns (uint256);
     function permit(address, address, uint256, uint256, bytes memory) external;
     function permit(address, address, uint256, uint256, uint8, bytes32, bytes32) external;
 }
@@ -67,10 +79,176 @@ contract MockMultisig is SignerLike {
  * @title Token Tests
  * @dev Contains tests for token contracts similar to https://github.com/makerdao/xdomain-dss/blob/master/src/Dai.sol
  */
-contract TokenTests is Test {
+contract TokenTests is DssTest {
 
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
+
+    function forceMint(address _token, address _who, uint256 _amount) internal {
+        GodMode.setWard(_token, _who, _amount);
+    }
+
+    // ************************************************************************************************************
+    // ERC20
+    // ************************************************************************************************************
+
+    function checkERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
+        checkMetadata(_token, _tokenName, _symbol, _version, _decimals);
+        checkApprove(_token);
+        checkIncreaseAllowance(_token);
+        checkDecreaseAllowance(_token);
+        checkTransfer(_token);
+        checkTransferFrom(_token);
+        checkInfiniteApproveTransferFrom(_token);
+        checkDecreaseAllowanceInsufficientBalance(_token, _contractName);
+        checkTransferBadAddress(_token, _contractName);
+        checkTransferFromBadAddress(_token, _contractName);
+        checkTransferInsufficientBalance(_token, _contractName);
+        checkTransferFromInsufficientAllowance(_token, _contractName);
+        checkTransferFromInsufficientBalance(_token, _contractName);
+    }
+
+    function checkMetadata(address _token, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
+        assertEq(TokenLike(_token).version(), _version); // Note that this is not part of the ERC20 standard
+        assertEq(TokenLike(_token).name(), _tokenName);
+        assertEq(TokenLike(_token).symbol(), _symbol);
+        assertEq(TokenLike(_token).decimals(), _decimals);
+    }
+
+    function checkApprove(address _token) public {
+        vm.expectEmit(true, true, true, true);
+        emit Approval(address(this), address(0xBEEF), 1e18);
+        assertTrue(TokenLike(_token).approve(address(0xBEEF), 1e18));
+
+        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), 1e18);
+    }
+
+    function checkIncreaseAllowance(address _token) public {
+        vm.expectEmit(true, true, true, true);
+        emit Approval(address(this), address(0xBEEF), 1e18);
+        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
+
+        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), 1e18);
+    }
+
+    function checkDecreaseAllowance(address _token) public {
+        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 3e18));
+        vm.expectEmit(true, true, true, true);
+        emit Approval(address(this), address(0xBEEF), 2e18);
+        assertTrue(TokenLike(_token).decreaseAllowance(address(0xBEEF), 1e18));
+
+        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), 2e18);
+    }
+
+    function checkTransfer(address _token) public {
+        forceMint(_token, address(this), 1e18);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(address(this), address(0xBEEF), 1e18);
+        assertTrue(TokenLike(_token).transfer(address(0xBEEF), 1e18));
+        assertEq(TokenLike(_token).totalSupply(), 1e18);
+
+        assertEq(TokenLike(_token).balanceOf(address(this)), 0);
+        assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), 1e18);
+    }
+
+    function checkTransferFrom(address _token) public {
+        address from = address(0xABCD);
+
+        forceMint(_token, address(this), 1e18);
+
+        vm.prank(from);
+        TokenLike(_token).approve(address(this), 1e18);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(from, address(0xBEEF), 1e18);
+        assertTrue(TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18));
+        assertEq(TokenLike(_token).totalSupply(), 1e18);
+
+        assertEq(TokenLike(_token).allowance(from, address(this)), 0);
+
+        assertEq(TokenLike(_token).balanceOf(from), 0);
+        assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), 1e18);
+    }
+
+    function checkInfiniteApproveTransferFrom(address _token) public {
+        address from = address(0xABCD);
+
+        forceMint(_token, address(this), 1e18);
+
+        vm.prank(from);
+        vm.expectEmit(true, true, true, true);
+        emit Approval(from, address(this), type(uint256).max);
+        TokenLike(_token).approve(address(this), type(uint256).max);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(from, address(0xBEEF), 1e18);
+        assertTrue(TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18));
+        assertEq(TokenLike(_token).totalSupply(), 1e18);
+
+        assertEq(TokenLike(_token).allowance(from, address(this)), type(uint256).max);
+
+        assertEq(TokenLike(_token).balanceOf(from), 0);
+        assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), 1e18);
+    }
+
+    function checkDecreaseAllowanceInsufficientBalance(address _token, string memory _contractName) public {
+        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
+        TokenLike(_token).decreaseAllowance(address(0xBEEF), 2e18);
+    }
+
+    function checkTransferBadAddress(address _token, string memory _contractName) public {
+        forceMint(_token, address(this), 1e18);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        TokenLike(_token).transfer(address(0), 1e18);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        TokenLike(_token).transfer(_token, 1e18);
+    }
+
+    function checkTransferFromBadAddress(address _token, string memory _contractName) public {
+        forceMint(_token, address(this), 1e18);
+        
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        TokenLike(_token).transferFrom(address(this), address(0), 1e18);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        TokenLike(_token).transferFrom(address(this), address(TokenLike(_token)), 1e18);
+    }
+
+    function checkTransferInsufficientBalance(address _token, string memory _contractName) public {
+        forceMint(_token, address(this), 1e18);
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).transfer(address(0xBEEF), 1e18);
+    }
+
+    function checkTransferFromInsufficientAllowance(address _token, string memory _contractName) public {
+        address from = address(0xABCD);
+
+        forceMint(_token, from, 1e18);
+
+        vm.prank(from);
+        TokenLike(_token).approve(address(this), 0.9e18);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
+        TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18);
+    }
+
+    function checkTransferFromInsufficientBalance(address _token, string memory _contractName) public {
+        address from = address(0xABCD);
+
+        forceMint(_token, from, 0.9e18);
+
+        vm.prank(from);
+        TokenLike(_token).approve(address(this), 1e18);
+
+         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18);
+    }
+
+    // ************************************************************************************************************
+    // PERMIT
+    // ************************************************************************************************************
 
     bytes32 constant PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");

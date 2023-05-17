@@ -15,7 +15,6 @@ contract PermitTest is TokenTests {
 
     function test_checkPermit() public {
         checkPermit(token, tokenName);
-
     } 
     function test_checkPermitEOA() public {
         checkPermitEOA(token);
