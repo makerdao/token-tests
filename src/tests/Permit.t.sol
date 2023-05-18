@@ -2,9 +2,10 @@
 pragma solidity ^0.8.13;
 
 import "../TokenTests.sol";
+import "../TokenFuzzTests.sol";
 import "./SampleToken.sol";
 
-contract PermitTest is TokenTests {
+contract PermitTest is TokenTests, TokenFuzzTests {
 
     address token;
     string tokenName = "SampleToken";
@@ -12,6 +13,8 @@ contract PermitTest is TokenTests {
     function setUp() public {
         token = address(new SampleToken());
     }
+
+    // Unit tests
 
     function test_checkPermit() public {
         checkPermit(token, tokenName);
@@ -57,6 +60,59 @@ contract PermitTest is TokenTests {
     } 
     function testFail_checkPermitReplay_revert_name() public {
         checkPermitReplay(token, "BadName");
+    }
+
+    // Fuzz tests
+
+    function test_fuzzCheckPermit(
+        uint128 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline,
+        uint256 nonce
+    ) public {
+        fuzzCheckPermit(token, tokenName, privKey, to, amount, deadline, nonce);
+    } 
+    function test_fuzzCheckPermitEOA(
+        uint248 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline
+    ) public {
+        fuzzCheckPermitEOA(token, privKey, to, amount, deadline);
+    } 
+    function test_fuzzCheckPermitBadNonce(
+        uint128 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline,
+        uint256 nonce
+    ) public {
+        fuzzCheckPermitBadNonce(token, tokenName, privKey, to, amount, deadline, nonce);
+    } 
+    function test_fuzzCheckPermitBadDeadline(
+        uint128 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline
+    ) public {
+        fuzzCheckPermitBadDeadline(token, tokenName, privKey, to, amount, deadline);
+    } 
+    function test_fuzzCheckPermitPastDeadline(
+        uint128 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline
+    ) public {
+        fuzzCheckPermitPastDeadline(token, tokenName, privKey, to, amount, deadline);
+    } 
+    function test_fuzzCheckPermitReplay(
+        uint128 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline
+    ) public {
+        fuzzCheckPermitReplay(token, tokenName, privKey, to, amount, deadline);
     } 
 
 }
