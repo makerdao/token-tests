@@ -27,26 +27,157 @@ contract TokenFuzzTests is TokenTests {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function fuzzCheckMintBurn(address _token, string memory _contractName) public {
-
+    function fuzzCheckMintBurn(
+        address _token,
+        string memory _contractName,
+        address who,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        fuzzCheckMint(_token, _contractName, who, mintAmount);
+        fuzzCheckBurn(_token, who, mintAmount, burnAmount);
     }
 
+
+    function fuzzCheckMint(
+        address _token,
+        string memory _contractName,
+        address to,
+        uint256 mintAmount
+    ) public {
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
+        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
+        if (to != address(0) && to != _token) {
+            vm.expectEmit(true, true, true, true);
+            emit Transfer(address(0), to, mintAmount);
+        } else {
+            vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        }
+
+        TokenLike(_token).mint(to, mintAmount);
+
+        if (to != address(0) && to != _token) {
+            assertEq(TokenLike(_token).totalSupply(), prevSupply + mintAmount);
+            assertEq(TokenLike(_token).balanceOf(to), prevToBalance + mintAmount);
+        }
+    }
+
+    function fuzzCheckBurn(
+        address _token,
+        address from,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        if (from == address(0) || from == _token) return;
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
+        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
+        burnAmount = bound(burnAmount, 0, mintAmount);
+
+        TokenLike(_token).mint(from, mintAmount);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(from, address(0), burnAmount);
+        vm.prank(from);
+        TokenLike(_token).burn(from, burnAmount);
+
+        assertEq(TokenLike(_token).totalSupply(), prevSupply + mintAmount - burnAmount);
+        assertEq(TokenLike(_token).balanceOf(from), prevFromBalance + mintAmount - burnAmount);
+    }
 
     // ************************************************************************************************************
     // ERC20
     // ************************************************************************************************************
 
-    function fuzzCheckERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
-        
+    function fuzzCheckERC20(
+        address _token,
+        address to,
+        uint256 approval,
+        uint256 amount
+    ) public {
+        fuzzCheckApprove(_token, to, amount);
+        fuzzCheckTransfer(_token, to, amount);
+        fuzzCheckTransferFrom(_token, to, approval, amount);
     }
 
+    function fuzzCheckApprove(
+        address _token,
+        address to,
+        uint256 amount
+    ) public {
+        uint256 prevAllowance = TokenLike(_token).allowance(address(this), to);
+
+        vm.expectEmit(true, true, true, true);
+        emit Approval(address(this), to, amount);
+        assertTrue(TokenLike(_token).approve(to, amount));
+
+        assertEq(TokenLike(_token).allowance(address(this), to), prevAllowance + amount);
+    }
+
+    function fuzzCheckTransfer(
+        address _token,
+        address to,
+        uint256 amount
+    ) public {
+        if (to == address(0) || to == _token) return;
+        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
+        amount = bound(amount, 0, type(uint256).max - prevToBalance);
+        TokenLike(_token).mint(address(this), amount);
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(address(this), to, amount);
+        assertTrue(TokenLike(_token).transfer(to, amount));
+
+        assertEq(TokenLike(_token).totalSupply(), prevSupply);
+        if (address(this) == to) {
+            assertEq(TokenLike(_token).balanceOf(address(this)), prevSenderBalance);
+        } else {
+            assertEq(TokenLike(_token).balanceOf(address(this)), prevSenderBalance - amount);
+            assertEq(TokenLike(_token).balanceOf(to), prevToBalance + amount);
+        }
+    }
+
+    function fuzzCheckTransferFrom(
+        address _token,
+        address to,
+        uint256 approval,
+        uint256 amount
+    ) public {
+        if (to == address(0) || to == _token) return;
+        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
+        approval = bound(approval, 0, type(uint256).max - prevToBalance);
+        amount = bound(amount, 0, approval);
+        address from = address(0xABCD);
+        TokenLike(_token).mint(from, amount);
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
+        vm.prank(from);
+        TokenLike(_token).approve(address(this), approval);
+
+        vm.expectEmit(true, true, true, true);
+        emit Transfer(from, to, amount);
+        assertTrue(TokenLike(_token).transferFrom(from, to, amount));
+
+        assertEq(TokenLike(_token).totalSupply(), prevSupply);
+        uint256 app = from == address(this) || approval == type(uint256).max ? approval : approval - amount;
+        assertEq(TokenLike(_token).allowance(from, address(this)), app);
+        if (from == to) {
+            assertEq(TokenLike(_token).balanceOf(from), prevFromBalance);
+        } else  {
+            assertEq(TokenLike(_token).balanceOf(from), prevFromBalance - amount);
+            assertEq(TokenLike(_token).balanceOf(to), prevToBalance + amount);
+        }
+    }
 
     // ************************************************************************************************************
     // PERMIT
     // ************************************************************************************************************
 
     function fuzzCheckPermit(
-        address _token, 
+        address _token,
         string memory _contractName,
         uint128 privKey,
         address to,

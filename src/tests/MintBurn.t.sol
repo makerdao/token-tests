@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../TokenTests.sol";
+import "../TokenFuzzTests.sol";
 import "./SampleToken.sol";
 
-contract MintBurnTest is TokenTests {
+contract MintBurnTest is TokenTests, TokenFuzzTests {
 
     address token;
     string tokenName = "SampleToken";
@@ -12,6 +12,8 @@ contract MintBurnTest is TokenTests {
     function setUp() public {
         token = address(new SampleToken());
     }
+
+    // Unit tests
 
     function test_checkMintBurn() public {
         checkMintBurn(token, tokenName);
@@ -34,4 +36,28 @@ contract MintBurnTest is TokenTests {
     function test_checkMintBadAddress() public {
         checkMintBadAddress(token, tokenName);
     }
+
+    // Fuzz tests
+
+
+    function test_fuzzCheckMintBurn(
+        address who,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        fuzzCheckMintBurn(token, tokenName, who, mintAmount, burnAmount);
+    } 
+    function test_fuzzCheckMint(
+        address who,
+        uint256 mintAmount
+    ) public {
+        fuzzCheckMint(token, tokenName, who, mintAmount);
+    } 
+    function test_fuzzCheckBurn(
+        address who,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        fuzzCheckBurn(token, who, mintAmount, burnAmount);
+    } 
 }

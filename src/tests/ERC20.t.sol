@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../TokenTests.sol";
+import "../TokenFuzzTests.sol";
 import "./SampleToken.sol";
 
 
 
-contract ERC20Test is TokenTests {
+contract ERC20Test is TokenTests, TokenFuzzTests {
 
     address token;
     string contractName = "SampleToken";
@@ -18,6 +18,8 @@ contract ERC20Test is TokenTests {
     function setUp() public {
         token = address(new SampleToken());
     }
+
+    // Unit Tests
 
     function test_checkERC20() public {
         checkERC20(token, contractName, tokenName, symbol, version, decimals);
@@ -76,4 +78,33 @@ contract ERC20Test is TokenTests {
     function testFail_checkTransferFromInsufficientBalance() public {
         checkTransferFromInsufficientBalance(token, "BadName");
     }
+
+    // Fuzz Tests
+
+    function test_fuzzCheckERC20(
+        address to,
+        uint256 approval,
+        uint256 amount
+    ) public {
+        fuzzCheckERC20(token, to, approval, amount);
+    } 
+    function test_fuzzCheckApprove(
+        address to,
+        uint256 amount
+    ) public {
+        fuzzCheckApprove(token, to, amount);
+    } 
+    function test_fuzzCheckTransfer(
+        address to,
+        uint256 amount
+    ) public {
+        fuzzCheckTransfer(token, to, amount);
+    } 
+    function test_fuzzCheckTransferFrom(
+        address to,
+        uint256 approval,
+        uint256 amount
+    ) public {
+        fuzzCheckTransferFrom(token, to, approval, amount);
+    } 
 }
