@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity >=0.8.0;
 
 import "../TokenFuzzTests.sol";
 import "./SampleToken.sol";
@@ -11,19 +11,20 @@ contract MintBurnTest is TokenTests, TokenFuzzTests {
 
     function setUp() public {
         token = address(new SampleToken());
+        TokenLike(token).deny(address(this));
     }
 
     // Unit tests
 
     function test_checkMintBurn() public {
         checkMintBurn(token, tokenName);
-    } 
+    }
     function test_checkAuth() public {
         checkTokenAuth(token, tokenName);
-    } 
+    }
     function test_checkMint() public {
         checkMint(token);
-    } 
+    }
     function test_checkBurn() public {
         checkBurn(token);
     }
@@ -32,7 +33,7 @@ contract MintBurnTest is TokenTests, TokenFuzzTests {
     }
     function testFail_checkMintBadAddress_revert_name() public {
         checkMintBadAddress(token, "BadName");
-    } 
+    }
     function test_checkMintBadAddress() public {
         checkMintBadAddress(token, tokenName);
     }

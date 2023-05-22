@@ -23,6 +23,8 @@ import "./TokenTests.sol";
  */
 contract TokenFuzzTests is TokenTests {
 
+    using GodMode for *;
+
     // ************************************************************************************************************
     // Mint/Burn
     // ************************************************************************************************************
@@ -48,6 +50,8 @@ contract TokenFuzzTests is TokenTests {
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
+        uint256 prevWard = TokenLike(_token).wards(address(this));
+        _token.setWard(address(this), 1);
         if (to != address(0) && to != _token) {
             vm.expectEmit(true, true, true, true);
             emit Transfer(address(0), to, mintAmount);
@@ -61,6 +65,7 @@ contract TokenFuzzTests is TokenTests {
             assertEq(TokenLike(_token).totalSupply(), prevSupply + mintAmount);
             assertEq(TokenLike(_token).balanceOf(to), prevToBalance + mintAmount);
         }
+        _token.setWard(address(this), prevWard);
     }
 
     function fuzzCheckBurn(
@@ -75,7 +80,7 @@ contract TokenFuzzTests is TokenTests {
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
         burnAmount = bound(burnAmount, 0, mintAmount);
 
-        TokenLike(_token).mint(from, mintAmount);
+        forceMint(_token, from, mintAmount);
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(from, address(0), burnAmount);
@@ -123,7 +128,7 @@ contract TokenFuzzTests is TokenTests {
         if (to == address(0) || to == _token) return;
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         amount = bound(amount, 0, type(uint256).max - prevToBalance);
-        TokenLike(_token).mint(address(this), amount);
+        forceMint(_token, address(this), amount);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
 
@@ -151,7 +156,7 @@ contract TokenFuzzTests is TokenTests {
         approval = bound(approval, 0, type(uint256).max - prevToBalance);
         amount = bound(amount, 0, approval);
         address from = address(0xABCD);
-        TokenLike(_token).mint(from, amount);
+        forceMint(_token, from, amount);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
         vm.prank(from);

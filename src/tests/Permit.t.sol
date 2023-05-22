@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity >=0.8.0;
 
 import "../TokenFuzzTests.sol";
 import "./SampleToken.sol";
@@ -11,6 +11,7 @@ contract PermitTest is TokenTests, TokenFuzzTests {
 
     function setUp() public {
         token = address(new SampleToken());
+        TokenLike(token).deny(address(this));
     }
 
     // Unit tests

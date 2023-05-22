@@ -25,18 +25,19 @@ interface TokenLike {
     function totalSupply() external view returns (uint256);
     function balanceOf(address) external view returns (uint256);
     function allowance(address, address) external view returns (uint256);
+    function DOMAIN_SEPARATOR() external view returns (bytes32);
+    function nonces(address) external view returns (uint256);
+    function wards(address) external view returns (uint256);
+    function deny(address) external;
     function approve(address, uint256) external returns (bool);
     function transfer(address, uint256) external returns (bool);
     function transferFrom(address, address, uint256) external returns (bool);
     function increaseAllowance(address, uint256) external returns (bool);
     function decreaseAllowance(address, uint256) external returns (bool);
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
-    function nonces(address) external view returns (uint256);
     function mint(address, uint256) external;
     function burn(address, uint256) external;
     function permit(address, address, uint256, uint256, bytes memory) external;
     function permit(address, address, uint256, uint256, uint8, bytes32, bytes32) external;
-    function wards(address) external returns (uint256);
 }
 
 interface SignerLike {
@@ -117,14 +118,14 @@ contract TokenTests is DssTest {
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevRecipientBalance = TokenLike(_token).balanceOf(address(0xBEEF));
 
-        TokenLike(_token).mint(address(0xBEEF), 1e18);
+        forceMint(_token, address(0xBEEF), 1e18);
 
         assertEq(TokenLike(_token).totalSupply(), prevSupply + 1e18);
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
     }
 
     function checkBurn(address _token) public {
-        TokenLike(_token).mint(address(0xBEEF), 1e18);
+        forceMint(_token, address(0xBEEF), 1e18);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevTargetBalance = TokenLike(_token).balanceOf(address(0xBEEF));
 
@@ -138,7 +139,7 @@ contract TokenTests is DssTest {
     }
 
     function checkBurnDifferentFrom(address _token) public {
-        TokenLike(_token).mint(address(0xBEEF), 1e18);
+        forceMint(_token, address(0xBEEF), 1e18);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevAllowance = TokenLike(_token).allowance(address(0xBEEF), address(this));
         uint256 prevTargetBalance = TokenLike(_token).balanceOf(address(0xBEEF));
@@ -168,10 +169,15 @@ contract TokenTests is DssTest {
     }
 
     function checkMintBadAddress(address _token, string memory _contractName) public {
+        uint256 prevWard = TokenLike(_token).wards(address(this));
+        _token.setWard(address(this), 1);
+
         vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
         TokenLike(_token).mint(address(0), 1e18);
         vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
         TokenLike(_token).mint(_token, 1e18);
+
+        _token.setWard(address(this), prevWard);
     }
 
     // ************************************************************************************************************
