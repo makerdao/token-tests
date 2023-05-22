@@ -1,0 +1,13 @@
+# token-tests
+
+Test suite for a standard "Maker-style" ERC20 token. An example of such a standard token can be found in `src/tests/SampleToken.sol`.
+
+## Getting Started
+
+Run `forge install makerdao/token-tests` in your newly setup repository.
+
+Inherit your test contract from `token-tests/TokenTests.sol` instead of `std-forge/Test.sol`. You will then be able to call individual token testing functions (all starting with the prefix `check`) or, alternatively, bulk testing functions such as `checkERC20()`, `checkMintBurn()` or `checkPermit()`.
+
+If you wish to use fuzz testing functions to fuzz test your token, inherit your test contract from `token-tests/FuzzTokenTests.sol`. You will then be able to call any of the token fuzz testing functions (all starting with the prefix `fuzzCheck`).
+
+You may wish to look at the tests in `tests` for more detailed example usage.
