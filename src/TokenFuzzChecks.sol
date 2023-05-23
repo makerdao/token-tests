@@ -15,13 +15,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 pragma solidity >=0.8.0;
 
-import "./TokenTests.sol";
+import "./TokenChecks.sol";
 
 /** 
- * @title Token Fuzz Tests
- * @dev Contains fuzz tests for token contracts similar to test/SampleToken.sol
+ * @title Token Fuzz Checks
+ * @dev Contains fuzz checks for token contracts similar to test/SampleToken.sol
  */
-contract TokenFuzzTests is TokenTests {
+contract TokenFuzzChecks is TokenChecks {
 
     using GodMode for *;
 

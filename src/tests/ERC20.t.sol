@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0;
 
-import "../TokenFuzzTests.sol";
+import "../TokenFuzzChecks.sol";
 import "./SampleToken.sol";
 
-contract ERC20Test is TokenTests, TokenFuzzTests {
+contract ERC20Test is TokenChecks, TokenFuzzChecks {
 
     address token;
     string contractName = "SampleToken";
