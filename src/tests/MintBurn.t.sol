@@ -40,7 +40,6 @@ contract MintBurnTest is TokenChecks, TokenFuzzChecks {
 
     // Fuzz tests
 
-
     function test_fuzzCheckMintBurn(
         address who,
         uint256 mintAmount,

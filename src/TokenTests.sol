@@ -61,5 +61,101 @@ abstract contract TokenTests is TokenChecks {
         checkMintBadAddress(_token_, _contractName_);
     }
 
-    // TODO: Add tests for ERC20, Permit and fuzzing
+    // ************************************************************************************************************
+    // ERC20
+    // ************************************************************************************************************
+
+    function test_ERC20() public {
+        assertVarsSet();
+        checkERC20(_token_, _contractName_, _tokenName_, _symbol_, version, decimals);
+    }
+    function test_Metadata() public {
+        assertVarsSet();
+        checkMetadata(_token_, _tokenName_, _symbol_, version, decimals);
+    }
+    function test_Approve() public {
+        assertVarsSet();
+        checkApprove(_token_);
+    }
+    function test_IncreaseAllowance() public {
+        assertVarsSet();
+        checkIncreaseAllowance(_token_);
+    }
+    function test_Transfer() public {
+        assertVarsSet();
+        checkTransfer(_token_);
+    }
+    function test_TransferFrom() public {
+        assertVarsSet();
+        checkTransferFrom(_token_);
+    }
+    function test_InfiniteApproveTransferFrom() public {
+        assertVarsSet();
+        checkInfiniteApproveTransferFrom(_token_);
+    }
+    function test_DecreaseAllowanceInsufficientBalance() public {
+        assertVarsSet();
+        checkDecreaseAllowanceInsufficientBalance(_token_, _contractName_);
+    }
+    function test_TransferBadAddress() public {
+        assertVarsSet();
+        checkTransferBadAddress(_token_, _contractName_);
+    }
+    function test_TransferFromBadAddress() public {
+        assertVarsSet();
+        checkTransferFromBadAddress(_token_, _contractName_);
+    }
+    function test_TransferInsufficientBalance() public {
+        assertVarsSet();
+        checkTransferInsufficientBalance(_token_, _contractName_);
+    }
+    function test_TransferFromInsufficientAllowance() public {
+        assertVarsSet();
+        checkTransferFromInsufficientAllowance(_token_, _contractName_);
+    }
+    function test_TransferFromInsufficientBalance() public {
+        assertVarsSet();
+        checkTransferFromInsufficientBalance(_token_, _contractName_);
+    }
+
+    // ************************************************************************************************************
+    // Permit
+    // ************************************************************************************************************
+
+    function test_Permit() public {
+        assertVarsSet();
+        checkPermit(_token_, _contractName_);
+    } 
+    function test_PermitEOA() public {
+        assertVarsSet();
+        checkPermitEOA(_token_);
+    } 
+    function test_PermitContract() public {
+        assertVarsSet();
+        checkPermitContract(_token_);
+    } 
+    function test_PermitContractInvalidSignature() public {
+        assertVarsSet();
+        checkPermitContractInvalidSignature(_token_, _contractName_);
+    }
+    function test_PermitBadNonce() public {
+        assertVarsSet();
+        checkPermitBadNonce(_token_, _contractName_);
+    } 
+    function test_PermitBadDeadline() public {
+        assertVarsSet();
+        checkPermitBadDeadline(_token_, _contractName_);
+    } 
+    function test_PermitPastDeadline() public {
+        assertVarsSet();
+        checkPermitPastDeadline(_token_, _contractName_);
+    } 
+    function test_PermitOwnerZero() public {
+        assertVarsSet();
+        checkPermitOwnerZero(_token_, _contractName_);
+    } 
+    function test_PermitReplay() public {
+        assertVarsSet();
+        checkPermitReplay(_token_, _contractName_);
+    } 
 }

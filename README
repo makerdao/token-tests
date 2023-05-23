@@ -22,7 +22,9 @@ That's the recommended way. Inherit your test contract from `token-tests/TokenTe
     }
 ```
 
-That's it. A suite of tests covering Mint/Burn, ERC20 functionalities and Permit will automatically be run for you. You can use `tests/TokenTests.t.sol` as an example of this first approach.
+That's it. A suite of tests covering Mint/Burn, ERC20 functionalities and Permit will automatically be run for you. If you also want fuzz tests to be run, use `token-tests/TokenFuzzTests.sol` as your base class (which itself inherits from `TokenTests.sol`).
+
+You can use `tests/TokenTests.t.sol` as an example of this first approach.
 
 ### 2) Explicitely specifying your tests in your test class
 
