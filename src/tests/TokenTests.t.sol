@@ -6,7 +6,6 @@ import "./SampleToken.sol";
 
 contract TokenTestsTests is TokenTests 
  {
-
     function setUp() public {
         _token_ = address(new SampleToken());
         _tokenName_ = "Sample Token";
