@@ -85,7 +85,11 @@ contract ERC20Test is TokenChecks, TokenFuzzChecks {
         uint256 approval,
         uint256 amount
     ) public {
-        fuzzCheckERC20(token, to, approval, amount);
+        fuzzCheckERC20(token, tokenName, symbol, version, decimals, to, approval, amount);
+    } 
+    function test_fuzzCheckMetadata(
+    ) public {
+        fuzzCheckMetadata(token, tokenName, symbol, version, decimals);
     } 
     function test_fuzzCheckApprove(
         address to,

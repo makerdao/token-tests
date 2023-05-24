@@ -97,13 +97,31 @@ contract TokenFuzzChecks is TokenChecks {
 
     function fuzzCheckERC20(
         address _token,
+        string memory _tokenName,
+        string memory _symbol,
+        string memory _version,
+        uint8 _decimals,
         address to,
         uint256 approval,
         uint256 amount
     ) public {
+        fuzzCheckMetadata(_token, _tokenName, _symbol, _version, _decimals);
         fuzzCheckApprove(_token, to, amount);
         fuzzCheckTransfer(_token, to, amount);
         fuzzCheckTransferFrom(_token, to, approval, amount);
+    }
+
+    function fuzzCheckMetadata(
+        address _token,
+        string memory _tokenName,
+        string memory _symbol,
+        string memory _version,
+        uint8 _decimals
+    ) public {
+        assertEq(TokenLike(_token).version(), _version); // Note that this is not part of the ERC20 standard
+        assertEq(TokenLike(_token).name(), _tokenName);
+        assertEq(TokenLike(_token).symbol(), _symbol);
+        assertEq(TokenLike(_token).decimals(), _decimals);
     }
 
     function fuzzCheckApprove(
