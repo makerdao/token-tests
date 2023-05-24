@@ -74,7 +74,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 mintAmount,
         uint256 burnAmount
     ) public {
-        if (from == address(0) || from == _token) return;
+        vm.assume(from != address(0) && from != _token);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
@@ -143,7 +143,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount
     ) public {
-        if (to == address(0) || to == _token) return;
+        vm.assume(to != address(0) && to != _token);
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         amount = bound(amount, 0, type(uint256).max - prevToBalance);
         forceMint(_token, address(this), amount);
@@ -169,7 +169,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 approval,
         uint256 amount
     ) public {
-        if (to == address(0) || to == _token) return;
+        vm.assume(to != address(0) && to != _token);
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         approval = bound(approval, 0, type(uint256).max - prevToBalance);
         amount = bound(amount, 0, approval);
