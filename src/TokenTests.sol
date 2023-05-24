@@ -22,14 +22,19 @@ abstract contract TokenTests is TokenChecks {
     string internal _contractName_;
     string internal _tokenName_;
     string internal _symbol_;
-    string internal version = "1";
-    uint8 internal decimals = 18;
+    string internal _version_ = "1";
+    uint8 internal _decimals_ = 18;
 
     function assertVarsSet() internal {
         assertTrue(_token_ != address(0), "TokenTests/_token_ is not set");
         assertTrue(bytes(_contractName_).length > 0, "TokenTests/_contractName_ is not set");
-        assertTrue(bytes(_tokenName_).length > 0, "TokenTests/_tokenName_ is not set");
-        assertTrue(bytes(_symbol_).length > 0, "TokenTests/_symbol_ is not set");
+
+        if(bytes(_tokenName_).length > 0) {
+            _tokenName_ = TokenLike(_token_).name();
+        }
+        if(bytes(_symbol_).length > 0) {
+            _symbol_ = TokenLike(_token_).symbol();
+        }
     }
 
     // ************************************************************************************************************
@@ -67,11 +72,11 @@ abstract contract TokenTests is TokenChecks {
 
     function test_ERC20() public {
         assertVarsSet();
-        checkERC20(_token_, _contractName_, _tokenName_, _symbol_, version, decimals);
+        checkERC20(_token_, _contractName_, _tokenName_, _symbol_, _version_, _decimals_);
     }
     function test_Metadata() public {
         assertVarsSet();
-        checkMetadata(_token_, _tokenName_, _symbol_, version, decimals);
+        checkMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
     }
     function test_Approve() public {
         assertVarsSet();

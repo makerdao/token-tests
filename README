@@ -15,10 +15,13 @@ That's the recommended way. Inherit your test contract from `token-tests/TokenTe
 ```
     function setUp() public {
         _token_ = address(new SampleToken());
-        _tokenName_ = "Sample Token";
         _contractName_ = "SampleToken";
-        _symbol_ = "TKN";
-        TokenLike(_token_).deny(address(this));
+
+        _tokenName_ = "Sample Token"; // this can be omitted, in which case the correctness of the token name won't be tested (not recommended)
+        _symbol_ = "TKN"; // this can be omitted, in which case the correctness of the symbol won't be tested (not recommended)
+
+        _version_ = "1"; // this can be omitted, in which case a default value of "1" is assumed
+        _decimals_ = 18; // this can be omitted, in which case a default value of 18 is assumed
     }
 ```
 
