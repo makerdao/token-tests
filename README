@@ -6,8 +6,30 @@ Test suite for a standard "Maker-style" ERC20 token. An example of such a standa
 
 Run `forge install makerdao/token-tests` in your newly setup repository.
 
-Inherit your test contract from `token-tests/TokenTests.sol` instead of `std-forge/Test.sol`. You will then be able to call individual token testing functions (all starting with the prefix `check`) or, alternatively, bulk testing functions such as `checkERC20()`, `checkMintBurn()` or `checkPermit()`.
+There are two possible ways to use `token-tests`
 
-If you wish to use fuzz testing functions to fuzz test your token, inherit your test contract from `token-tests/FuzzTokenTests.sol`. You will then be able to call any of the token fuzz testing functions (all starting with the prefix `fuzzCheck`).
+### 1) Letting `token-tests` handle testing for you
 
-You may wish to look at the tests in `tests` for more detailed example usage.
+That's the recommended way. Inherit your test contract from `token-tests/TokenTests.sol` instead of `std-forge/Test.sol`. You will then need to set the following inherited variables:
+
+```
+    function setUp() public {
+        _token_ = address(new SampleToken());
+        _tokenName_ = "Sample Token";
+        _contractName_ = "SampleToken";
+        _symbol_ = "TKN";
+        TokenLike(_token_).deny(address(this));
+    }
+```
+
+That's it. A suite of tests covering Mint/Burn, ERC20 functionalities and Permit will automatically be run for you. If you also want fuzz tests to be run, use `token-tests/TokenFuzzTests.sol` as your base class (which itself inherits from `TokenTests.sol`).
+
+You can use `tests/TokenTests.t.sol` as an example of this first approach.
+
+### 2) Explicitely specifying your tests in your test class
+
+Alternatively, if you want more fine-grained control over your tests, you can inherit your test contract from `token-tests/TokenChecks.sol`. You will then be able to call individual token testing functions (all starting with the prefix `check`) or, alternatively, bulk testing functions such as `checkERC20()`, `checkMintBurn()` or `checkPermit()`.
+
+If you wish to use fuzz testing functions to fuzz test your token, inherit your test contract from `token-tests/FuzzTokenChecks.sol`. You will then be able to call any of the token fuzz testing functions (all starting with the prefix `fuzzCheck`).
+
+You may use the tests in `tests/ERC20.t.sol`, `tests/MintBurn.t.sol` and `tests/Permit.t.sol` as examples of this second approach.
