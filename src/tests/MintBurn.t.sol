@@ -7,7 +7,7 @@ import "./SampleToken.sol";
 contract MintBurnTest is TokenChecks, TokenFuzzChecks {
 
     address token;
-    string tokenName = "SampleToken";
+    string contractName = "SampleToken";
 
     function setUp() public {
         token = address(new SampleToken());
@@ -17,10 +17,13 @@ contract MintBurnTest is TokenChecks, TokenFuzzChecks {
     // Unit tests
 
     function test_checkMintBurn() public {
-        checkMintBurn(token, tokenName);
+        checkMintBurn(token, contractName);
     }
-    function test_checkAuth() public {
-        checkTokenAuth(token, tokenName);
+    function test_checkTokenAuth() public {
+        checkTokenAuth(token, contractName);
+    }
+    function test_checkTokenModifiers() public {
+        checkTokenModifiers(token, contractName);
     }
     function test_checkMint() public {
         checkMint(token);
@@ -35,7 +38,10 @@ contract MintBurnTest is TokenChecks, TokenFuzzChecks {
         checkMintBadAddress(token, "BadName");
     }
     function test_checkMintBadAddress() public {
-        checkMintBadAddress(token, tokenName);
+        checkMintBadAddress(token, contractName);
+    }
+    function test_checkBurnInsufficientBalance() public {
+        checkBurnInsufficientBalance(token, contractName);
     }
 
     // Fuzz tests
@@ -45,13 +51,13 @@ contract MintBurnTest is TokenChecks, TokenFuzzChecks {
         uint256 mintAmount,
         uint256 burnAmount
     ) public {
-        fuzzCheckMintBurn(token, tokenName, who, mintAmount, burnAmount);
+        fuzzCheckMintBurn(token, contractName, who, mintAmount, burnAmount);
     } 
     function test_fuzzCheckMint(
         address who,
         uint256 mintAmount
     ) public {
-        fuzzCheckMint(token, tokenName, who, mintAmount);
+        fuzzCheckMint(token, contractName, who, mintAmount);
     } 
     function test_fuzzCheckBurn(
         address who,
@@ -59,5 +65,12 @@ contract MintBurnTest is TokenChecks, TokenFuzzChecks {
         uint256 burnAmount
     ) public {
         fuzzCheckBurn(token, who, mintAmount, burnAmount);
+    } 
+    function test_fuzzCheckBurnInsufficientBalance(
+        address to,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        fuzzCheckBurnInsufficientBalance(token, contractName, to, mintAmount, burnAmount);
     } 
 }

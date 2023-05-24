@@ -86,28 +86,49 @@ contract ERC20Test is TokenChecks, TokenFuzzChecks {
         uint256 amount
     ) public {
         fuzzCheckERC20(token, tokenName, symbol, version, decimals, to, approval, amount);
-    } 
+    }
     function test_fuzzCheckMetadata(
     ) public {
         fuzzCheckMetadata(token, tokenName, symbol, version, decimals);
-    } 
+    }
     function test_fuzzCheckApprove(
         address to,
         uint256 amount
     ) public {
         fuzzCheckApprove(token, to, amount);
-    } 
+    }
     function test_fuzzCheckTransfer(
         address to,
         uint256 amount
     ) public {
         fuzzCheckTransfer(token, to, amount);
-    } 
+    }
     function test_fuzzCheckTransferFrom(
         address to,
         uint256 approval,
         uint256 amount
     ) public {
         fuzzCheckTransferFrom(token, to, approval, amount);
+    }
+    function test_fuzzCheckTransferInsufficientBalance(
+        address to,
+        uint256 mintAmount,
+        uint256 sendAmount
+    ) public {
+        fuzzCheckTransferInsufficientBalance(token, contractName, to, mintAmount, sendAmount);
+    }
+    function test_fuzzCheckTransferFromInsufficientAllowance(
+        address to,
+        uint256 allowance,
+        uint256 amount
+    ) public {
+        fuzzCheckTransferFromInsufficientAllowance(token, contractName, to, allowance, amount);
+    }
+    function test_fuzzCheckTransferFromInsufficientBalance(
+        address to,
+        uint256 mintAmount,
+        uint256 sendAmount
+    ) public {
+        fuzzCheckTransferFromInsufficientBalance(token, contractName, to, mintAmount, sendAmount);
     } 
 }

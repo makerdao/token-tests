@@ -91,6 +91,37 @@ contract TokenFuzzChecks is TokenChecks {
         assertEq(TokenLike(_token).balanceOf(from), prevFromBalance + mintAmount - burnAmount);
     }
 
+    function fuzzCheckBurnInsufficientBalance(
+        address _token,
+        string memory _contractName,
+        address to,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        vm.assume(to != address(0) && to != _token);
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
+        burnAmount = bound(burnAmount, mintAmount + 1, type(uint256).max);
+        forceMint(_token, to, mintAmount);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).burn(to, burnAmount);
+    }
+
+    function fuzzCheckTokenModifiers(
+        address _token,
+        string memory _contractName,
+        address sender
+    ) public {
+        vm.assume(sender != address(this));
+        bytes4[] memory authedMethods = new bytes4[](1);
+        authedMethods[0] = TokenLike(_token).mint.selector;
+
+        vm.startPrank(sender);
+        checkModifier(_token, string(abi.encodePacked(_contractName, "/not-authorized")), authedMethods);
+        vm.stopPrank();
+    }
+
     // ************************************************************************************************************
     // ERC20
     // ************************************************************************************************************
@@ -129,13 +160,11 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount
     ) public {
-        uint256 prevAllowance = TokenLike(_token).allowance(address(this), to);
-
         vm.expectEmit(true, true, true, true);
         emit Approval(address(this), to, amount);
         assertTrue(TokenLike(_token).approve(to, amount));
 
-        assertEq(TokenLike(_token).allowance(address(this), to), prevAllowance + amount);
+        assertEq(TokenLike(_token).allowance(address(this), to), amount);
     }
 
     function fuzzCheckTransfer(
@@ -193,6 +222,61 @@ contract TokenFuzzChecks is TokenChecks {
             assertEq(TokenLike(_token).balanceOf(from), prevFromBalance - amount);
             assertEq(TokenLike(_token).balanceOf(to), prevToBalance + amount);
         }
+    }
+
+    function fuzzCheckTransferInsufficientBalance(
+        address _token,
+        string memory _contractName,
+        address to,
+        uint256 mintAmount,
+        uint256 sendAmount
+    ) public {
+        vm.assume(to != address(0) && to != address(_token));
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
+        sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
+        forceMint(_token, address(this), mintAmount);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).transfer(to, sendAmount);
+    }
+
+    function fuzzCheckTransferFromInsufficientBalance(
+        address _token,
+        string memory _contractName,
+        address to,
+        uint256 mintAmount,
+        uint256 sendAmount
+    ) public {
+        vm.assume(to != address(0) && to != address(_token));
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
+        sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
+        address from = address(0xABCD);
+        forceMint(_token, from, mintAmount);
+        vm.prank(from); TokenLike(_token).approve(address(this), sendAmount);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).transferFrom(from, to, sendAmount);
+    }
+
+    function fuzzCheckTransferFromInsufficientAllowance(
+        address _token,
+        string memory _contractName,
+        address to,
+        uint256 allowance,
+        uint256 amount
+    ) public {
+        vm.assume(to != address(0) && to != address(_token));
+        allowance = bound(allowance, 0, type(uint256).max - 1);
+        amount = bound(amount, allowance + 1, type(uint256).max);
+        address from = address(0xABCD);
+        forceMint(_token, from, amount);
+        vm.prank(from);
+        TokenLike(_token).approve(address(this), allowance);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
+        TokenLike(_token).transferFrom(from, to, amount);
     }
 
     // ************************************************************************************************************

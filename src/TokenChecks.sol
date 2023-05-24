@@ -102,14 +102,25 @@ contract TokenChecks is DssTest {
 
     function checkMintBurn(address _token, string memory _contractName) public {
         checkTokenAuth(_token, _contractName);
+        checkTokenModifiers(_token, _contractName);
         checkMint(_token);
         checkBurn(_token);
         checkBurnDifferentFrom(_token);
         checkMintBadAddress(_token, _contractName);
+        checkBurnInsufficientBalance(_token, _contractName);
     }
 
     function checkTokenAuth(address _token, string memory _contractName) public {
         checkAuth(_token, _contractName);
+    }
+
+    function checkTokenModifiers(address _token, string memory _contractName) public {
+        bytes4[] memory authedMethods = new bytes4[](1);
+        authedMethods[0] = TokenLike(_token).mint.selector;
+
+        vm.startPrank(address(0xBEEF));
+        checkModifier(_token, string(abi.encodePacked(_contractName, "/not-authorized")), authedMethods);
+        vm.stopPrank();
     }
 
     function checkMint(address _token) public {
@@ -141,17 +152,16 @@ contract TokenChecks is DssTest {
     function checkBurnDifferentFrom(address _token) public {
         forceMint(_token, address(0xBEEF), 1e18);
         uint256 prevSupply = TokenLike(_token).totalSupply();
-        uint256 prevAllowance = TokenLike(_token).allowance(address(0xBEEF), address(this));
         uint256 prevTargetBalance = TokenLike(_token).balanceOf(address(0xBEEF));
         vm.prank(address(0xBEEF));
         TokenLike(_token).approve(address(this), 0.4e18);
-        assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), prevAllowance + 0.4e18);
+        assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), 0.4e18);
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0xBEEF), address(0), 0.4e18);
         TokenLike(_token).burn(address(0xBEEF), 0.4e18);
 
-        assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), prevAllowance);
+        assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), 0);
         assertEq(TokenLike(_token).totalSupply(), prevSupply - 0.4e18);
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevTargetBalance - 0.4e18);
 
@@ -178,6 +188,14 @@ contract TokenChecks is DssTest {
         TokenLike(_token).mint(_token, 1e18);
 
         _token.setWard(address(this), prevWard);
+    }
+
+    function checkBurnInsufficientBalance(address _token, string memory _contractName) public {
+        uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
+        forceMint(_token, address(this), 0.9e18);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).burn(address(this), prevSenderBalance + 1e18);
     }
 
     // ************************************************************************************************************
@@ -210,11 +228,10 @@ contract TokenChecks is DssTest {
     function checkApprove(address _token) public {
         vm.expectEmit(true, true, true, true);
         emit Approval(address(this), address(0xBEEF), 1e18);
-        uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
 
         assertTrue(TokenLike(_token).approve(address(0xBEEF), 1e18));
 
-        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), prevAllowance + 1e18);
+        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), 1e18);
     }
 
     function checkIncreaseAllowance(address _token) public {
@@ -331,12 +348,11 @@ contract TokenChecks is DssTest {
     function checkTransferFromInsufficientAllowance(address _token, string memory _contractName) public {
         address from = address(0xABCD);
         forceMint(_token, from, 1e18);
-        uint256 prevAllowance = TokenLike(_token).allowance(from, address(0xBEEF));
         vm.prank(from);
         TokenLike(_token).approve(address(this), 0.9e18);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
-        TokenLike(_token).transferFrom(from, address(0xBEEF), prevAllowance + 1e18);
+        TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18);
     }
 
     function checkTransferFromInsufficientBalance(address _token, string memory _contractName) public {

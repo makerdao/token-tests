@@ -32,14 +32,14 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     ) public {
         assertVarsSet();
         fuzzCheckMintBurn(_token_, _contractName_, who, mintAmount, burnAmount);
-    } 
+    }
     function test_fuzzMint(
         address who,
         uint256 mintAmount
     ) public {
         assertVarsSet();
         fuzzCheckMint(_token_, _contractName_, who, mintAmount);
-    } 
+    }
     function test_fuzzBurn(
         address who,
         uint256 mintAmount,
@@ -47,7 +47,21 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     ) public {
         assertVarsSet();
         fuzzCheckBurn(_token_, who, mintAmount, burnAmount);
-    } 
+    }
+    function test_fuzzCheckBurnInsufficientBalance(
+        address to,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        assertVarsSet();
+        fuzzCheckBurnInsufficientBalance(_token_, _contractName_, to, mintAmount, burnAmount);
+    }
+    function test_fuzzCheckTokenModifiers(
+        address sender
+    ) public {
+        assertVarsSet();
+        fuzzCheckTokenModifiers(_token_, _contractName_, sender);
+    }
 
     // ************************************************************************************************************
     // ERC20
@@ -60,26 +74,26 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     ) public {
         assertVarsSet();
         fuzzCheckERC20(_token_, _tokenName_, _symbol_, _version_, _decimals_, to, approval, amount);
-    } 
+    }
     function test_fuzzMetadata(
     ) public {
         assertVarsSet();
         fuzzCheckMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
-    } 
+    }
     function test_fuzzApprove(
         address to,
         uint256 amount
     ) public {
         assertVarsSet();
         fuzzCheckApprove(_token_, to, amount);
-    } 
+    }
     function test_fuzzTransfer(
         address to,
         uint256 amount
     ) public {
         assertVarsSet();
         fuzzCheckTransfer(_token_, to, amount);
-    } 
+    }
     function test_fuzzTransferFrom(
         address to,
         uint256 approval,
@@ -87,7 +101,31 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     ) public {
         assertVarsSet();
         fuzzCheckTransferFrom(_token_, to, approval, amount);
-    } 
+    }
+    function test_fuzzCheckTransferInsufficientBalance(
+        address to,
+        uint256 mintAmount,
+        uint256 sendAmount
+    ) public {
+        assertVarsSet();
+        fuzzCheckTransferInsufficientBalance(_token_, _contractName_, to, mintAmount, sendAmount);
+    }
+    function test_fuzzCheckTransferFromInsufficientBalance(
+        address to,
+        uint256 mintAmount,
+        uint256 sendAmount
+    ) public {
+        assertVarsSet();
+        fuzzCheckTransferFromInsufficientBalance(_token_, _contractName_, to, mintAmount, sendAmount);
+    }
+    function test_fuzzCheckTransferFromInsufficientAllowance(
+        address to,
+        uint256 allowance,
+        uint256 amount
+    ) public {
+        assertVarsSet();
+        fuzzCheckTransferFromInsufficientAllowance(_token_, _contractName_, to, allowance, amount);
+    }
    
     // ************************************************************************************************************
     // Permit

@@ -7,7 +7,7 @@ import "./SampleToken.sol";
 contract PermitTest is TokenChecks, TokenFuzzChecks {
 
     address token;
-    string tokenName = "SampleToken";
+    string contractName = "SampleToken";
 
     function setUp() public {
         token = address(new SampleToken());
@@ -17,7 +17,7 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
     // Unit tests
 
     function test_checkPermit() public {
-        checkPermit(token, tokenName);
+        checkPermit(token, contractName);
     }
     function test_checkPermitEOA() public {
         checkPermitEOA(token);
@@ -26,37 +26,37 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
         checkPermitContract(token);
     }
     function test_checkPermitContractInvalidSignature() public {
-        checkPermitContractInvalidSignature(token, tokenName);
+        checkPermitContractInvalidSignature(token, contractName);
     }
     function testFail_checkPermitContractInvalidSignature_revert_name() public {
         checkPermitContractInvalidSignature(token, "BadName");
     }
     function test_checkPermitBadNonce() public {
-        checkPermitBadNonce(token, tokenName);
+        checkPermitBadNonce(token, contractName);
     }
     function testFail_checkPermitBadNonce_revert_name() public {
         checkPermitBadNonce(token, "BadName");
     }
     function test_checkPermitBadDeadline() public {
-        checkPermitBadDeadline(token, tokenName);
+        checkPermitBadDeadline(token, contractName);
     }
     function testFail_checkPermitBadDeadline_revert_name() public {
         checkPermitBadDeadline(token, "BadName");
     }
     function test_checkPermitPastDeadline() public {
-        checkPermitPastDeadline(token, tokenName);
+        checkPermitPastDeadline(token, contractName);
     }
     function testFail_checkPermitPastDeadline_revert_name() public {
         checkPermitPastDeadline(token, "BadName");
     }
     function test_checkPermitOwnerZero() public {
-        checkPermitOwnerZero(token, tokenName);
+        checkPermitOwnerZero(token, contractName);
     }
     function testFail_checkPermitOwnerZero_revert_name() public {
         checkPermitOwnerZero(token, "BadName");
     }
     function test_checkPermitReplay() public {
-        checkPermitReplay(token, tokenName);
+        checkPermitReplay(token, contractName);
     }
     function testFail_checkPermitReplay_revert_name() public {
         checkPermitReplay(token, "BadName");
@@ -71,7 +71,7 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
         uint256 deadline,
         uint256 nonce
     ) public {
-        fuzzCheckPermit(token, tokenName, privKey, to, amount, deadline, nonce);
+        fuzzCheckPermit(token, contractName, privKey, to, amount, deadline, nonce);
     }
     function test_fuzzCheckPermitEOA(
         uint248 privKey,
@@ -88,7 +88,7 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
         uint256 deadline,
         uint256 nonce
     ) public {
-        fuzzCheckPermitBadNonce(token, tokenName, privKey, to, amount, deadline, nonce);
+        fuzzCheckPermitBadNonce(token, contractName, privKey, to, amount, deadline, nonce);
     }
     function test_fuzzCheckPermitBadDeadline(
         uint128 privKey,
@@ -96,7 +96,7 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
         uint256 amount,
         uint256 deadline
     ) public {
-        fuzzCheckPermitBadDeadline(token, tokenName, privKey, to, amount, deadline);
+        fuzzCheckPermitBadDeadline(token, contractName, privKey, to, amount, deadline);
     }
     function test_fuzzCheckPermitPastDeadline(
         uint128 privKey,
@@ -104,7 +104,7 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
         uint256 amount,
         uint256 deadline
     ) public {
-        fuzzCheckPermitPastDeadline(token, tokenName, privKey, to, amount, deadline);
+        fuzzCheckPermitPastDeadline(token, contractName, privKey, to, amount, deadline);
     }
     function test_fuzzCheckPermitReplay(
         uint128 privKey,
@@ -112,7 +112,7 @@ contract PermitTest is TokenChecks, TokenFuzzChecks {
         uint256 amount,
         uint256 deadline
     ) public {
-        fuzzCheckPermitReplay(token, tokenName, privKey, to, amount, deadline);
+        fuzzCheckPermitReplay(token, contractName, privKey, to, amount, deadline);
     }
 
 }

@@ -45,9 +45,13 @@ abstract contract TokenTests is TokenChecks {
         assertVarsSet();
         checkMintBurn(_token_, _contractName_);
     }
-    function test_Auth() public {
+    function test_TokenAuth() public {
         assertVarsSet();
         checkTokenAuth(_token_, _contractName_);
+    }
+    function test_TokenModifiers() public {
+        assertVarsSet();
+        checkTokenModifiers(_token_, _contractName_);
     }
     function test_Mint() public {
         assertVarsSet();
@@ -64,6 +68,10 @@ abstract contract TokenTests is TokenChecks {
     function test_MintBadAddress() public {
         assertVarsSet();
         checkMintBadAddress(_token_, _contractName_);
+    }
+    function test_BurnInsufficientBalance() public {
+        assertVarsSet();
+        checkBurnInsufficientBalance(_token_, _contractName_);
     }
 
     // ************************************************************************************************************
