@@ -41,10 +41,6 @@ abstract contract TokenTests is TokenChecks {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function test_MintBurn() public {
-        assertVarsSet();
-        checkMintBurn(_token_, _contractName_);
-    }
     function test_TokenAuth() public {
         assertVarsSet();
         checkTokenAuth(_token_, _contractName_);
@@ -78,10 +74,6 @@ abstract contract TokenTests is TokenChecks {
     // ERC20
     // ************************************************************************************************************
 
-    function test_ERC20() public {
-        assertVarsSet();
-        checkERC20(_token_, _contractName_, _tokenName_, _symbol_, _version_, _decimals_);
-    }
     function test_Metadata() public {
         assertVarsSet();
         checkMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
@@ -135,10 +127,6 @@ abstract contract TokenTests is TokenChecks {
     // Permit
     // ************************************************************************************************************
 
-    function test_Permit() public {
-        assertVarsSet();
-        checkPermit(_token_, _contractName_);
-    } 
     function test_PermitEOA() public {
         assertVarsSet();
         checkPermitEOA(_token_);

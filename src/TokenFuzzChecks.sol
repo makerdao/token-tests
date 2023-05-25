@@ -29,7 +29,7 @@ contract TokenFuzzChecks is TokenChecks {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function fuzzCheckMintBurn(
+    function fuzzBulkCheckMintBurn(
         address _token,
         string memory _contractName,
         address who,
@@ -126,7 +126,7 @@ contract TokenFuzzChecks is TokenChecks {
     // ERC20
     // ************************************************************************************************************
 
-    function fuzzCheckERC20(
+    function fuzzBulkCheckERC20(
         address _token,
         string memory _tokenName,
         string memory _symbol,
@@ -283,7 +283,7 @@ contract TokenFuzzChecks is TokenChecks {
     // PERMIT
     // ************************************************************************************************************
 
-    function fuzzCheckPermit(
+    function fuzzBulkCheckPermit(
         address _token,
         string memory _contractName,
         uint128 privKey,

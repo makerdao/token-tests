@@ -25,14 +25,6 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function test_fuzzMintBurn(
-        address who,
-        uint256 mintAmount,
-        uint256 burnAmount
-    ) public {
-        assertVarsSet();
-        fuzzCheckMintBurn(_token_, _contractName_, who, mintAmount, burnAmount);
-    }
     function test_fuzzMint(
         address who,
         uint256 mintAmount
@@ -67,14 +59,6 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     // ERC20
     // ************************************************************************************************************
     
-    function test_fuzzERC20(
-        address to,
-        uint256 approval,
-        uint256 amount
-    ) public {
-        assertVarsSet();
-        fuzzCheckERC20(_token_, _tokenName_, _symbol_, _version_, _decimals_, to, approval, amount);
-    }
     function test_fuzzMetadata(
     ) public {
         assertVarsSet();
@@ -131,16 +115,6 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     // Permit
     // ************************************************************************************************************
 
-    function test_fuzzPermit(
-        uint128 privKey,
-        address to,
-        uint256 amount,
-        uint256 deadline,
-        uint256 nonce
-    ) public {
-        assertVarsSet();
-        fuzzCheckPermit(_token_, _contractName_, privKey, to, amount, deadline, nonce);
-    } 
     function test_fuzzPermitEOA(
         uint248 privKey,
         address to,

@@ -100,7 +100,7 @@ contract TokenChecks is DssTest {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function checkMintBurn(address _token, string memory _contractName) public {
+    function bulkCheckMintBurn(address _token, string memory _contractName) public {
         checkTokenAuth(_token, _contractName);
         checkTokenModifiers(_token, _contractName);
         checkMint(_token);
@@ -202,7 +202,7 @@ contract TokenChecks is DssTest {
     // ERC20
     // ************************************************************************************************************
 
-    function checkERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
+    function bulkCheckERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
         checkMetadata(_token, _tokenName, _symbol, _version, _decimals);
         checkApprove(_token);
         checkIncreaseAllowance(_token);
@@ -373,7 +373,7 @@ contract TokenChecks is DssTest {
     bytes32 constant PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
-    function checkPermit(address _token, string memory _contractName) internal {
+    function bulkCheckPermit(address _token, string memory _contractName) internal {
         checkPermitEOA(_token);
         checkPermitContract(_token);
         checkPermitContractInvalidSignature(_token, _contractName);
