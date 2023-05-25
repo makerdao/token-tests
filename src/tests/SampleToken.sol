@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/// Nst.sol -- Nst token
+/// SampleToken.sol -- Sample token
 
 // Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico
 // Copyright (C) 2023 Dai Foundation
