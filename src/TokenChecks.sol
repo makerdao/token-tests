@@ -288,7 +288,7 @@ contract TokenChecks is DssTest {
 
     function checkInfiniteApproveTransferFrom(address _token) public {
         address from = address(0xABCD);
-        deal(_token, from, TokenLike(_token).balanceOf(address(this)) + 1e18, true);
+        deal(_token, from, TokenLike(_token).balanceOf(address(from)) + 1e18, true);
         vm.prank(from);
         vm.expectEmit(true, true, true, true);
         emit Approval(from, address(this), type(uint256).max);
