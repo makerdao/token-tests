@@ -268,7 +268,7 @@ contract TokenChecks is DssTest {
 
     function checkTransferFrom(address _token) public {
         address from = address(0xABCD);
-        deal(_token, from, TokenLike(_token).balanceOf(address(this)) + 1e18, true);
+        deal(_token, from, TokenLike(_token).balanceOf(address(from)) + 1e18, true);
         vm.prank(from);
         TokenLike(_token).approve(address(this), 1e18);
         uint256 prevSupply = TokenLike(_token).totalSupply();
