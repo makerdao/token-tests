@@ -86,6 +86,10 @@ abstract contract TokenTests is TokenChecks {
         assertVarsSet();
         checkIncreaseAllowance(_token_);
     }
+    function test_DecreaseAllowance() public {
+        assertVarsSet();
+        checkDecreaseAllowance(_token_);
+    }
     function test_Transfer() public {
         assertVarsSet();
         checkTransfer(_token_);
