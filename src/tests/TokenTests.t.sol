@@ -13,4 +13,14 @@ contract TokenTestsTests is TokenTests, TokenFuzzTests
         _symbol_ = "TKN";
         TokenLike(_token_).deny(address(this));
     }
+
+    function test_bulkCheckMintBurn() public {
+        bulkCheckMintBurn(_token_, _contractName_);
+    }
+    function test_bulkCheckERC20() public {
+        bulkCheckERC20(_token_, _contractName_, _tokenName_, _symbol_, "1", 18);
+    }
+    function test_bulkCheckPermit() public {
+        bulkCheckPermit(_token_, _contractName_);
+    }
 }
