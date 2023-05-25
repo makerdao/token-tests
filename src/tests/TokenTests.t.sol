@@ -11,7 +11,8 @@ contract TokenTestsTests is TokenTests, TokenFuzzTests
         _tokenName_ = "Sample Token";
         _contractName_ = "SampleToken";
         _symbol_ = "TKN";
-        TokenLike(_token_).deny(address(this));
+
+        TokenLike(_token_).deny(address(this)); // this is not necessary and only done here to check that tests are not expecting the test contract to be auth
     }
 
     function test_bulkCheckMintBurn() public {
