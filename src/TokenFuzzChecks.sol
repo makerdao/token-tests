@@ -38,6 +38,8 @@ contract TokenFuzzChecks is TokenChecks {
     ) public {
         fuzzCheckMint(_token, _contractName, who, mintAmount);
         fuzzCheckBurn(_token, who, mintAmount, burnAmount);
+        fuzzCheckBurnInsufficientBalance(_token, _contractName, who, mintAmount, burnAmount);
+        fuzzCheckTokenModifiers(_token, _contractName, who);
     }
 
 
@@ -128,29 +130,32 @@ contract TokenFuzzChecks is TokenChecks {
 
     function fuzzBulkCheckERC20(
         address _token,
-        string memory _tokenName,
+        string memory _contractName,
         string memory _symbol,
         string memory _version,
         uint8 _decimals,
         address to,
-        uint256 approval,
-        uint256 amount
+        uint256 amount1,
+        uint256 amount2
     ) public {
-        fuzzCheckMetadata(_token, _tokenName, _symbol, _version, _decimals);
-        fuzzCheckApprove(_token, to, amount);
-        fuzzCheckTransfer(_token, to, amount);
-        fuzzCheckTransferFrom(_token, to, approval, amount);
+        fuzzCheckMetadata(_token, _contractName, _symbol, _version, _decimals);
+        fuzzCheckApprove(_token, to, amount1);
+        fuzzCheckTransfer(_token, to, amount1);
+        fuzzCheckTransferFrom(_token, to, amount1, amount2);
+        fuzzCheckTransferInsufficientBalance(_token, _contractName, to, amount1, amount2);
+        fuzzCheckTransferFromInsufficientBalance(_token, _contractName, to, amount1, amount2);
+        fuzzCheckTransferFromInsufficientAllowance(_token, _contractName, to, amount1, amount2);
     }
 
     function fuzzCheckMetadata(
         address _token,
-        string memory _tokenName,
+        string memory _contractName,
         string memory _symbol,
         string memory _version,
         uint8 _decimals
     ) public {
         assertEq(TokenLike(_token).version(), _version); // Note that this is not part of the ERC20 standard
-        assertEq(TokenLike(_token).name(), _tokenName);
+        assertEq(TokenLike(_token).name(), _contractName);
         assertEq(TokenLike(_token).symbol(), _symbol);
         assertEq(TokenLike(_token).decimals(), _decimals);
     }
