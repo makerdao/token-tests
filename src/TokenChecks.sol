@@ -206,7 +206,7 @@ contract TokenChecks is DssTest {
         checkTransfer(_token);
         checkTransferFrom(_token);
         checkInfiniteApproveTransferFrom(_token);
-        checkDecreaseAllowanceInsufficientBalance(_token, _contractName);
+        checkDecreaseAllowanceInsufficientAllowance(_token, _contractName);
         checkTransferBadAddress(_token, _contractName);
         checkTransferFromBadAddress(_token, _contractName);
         checkTransferInsufficientBalance(_token, _contractName);
@@ -231,6 +231,7 @@ contract TokenChecks is DssTest {
     }
 
     function checkIncreaseAllowance(address _token) public {
+        assertTrue(TokenLike(_token).approve(address(0xBEEF), 0.9e18));
         uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
 
         vm.expectEmit(true, true, true, true);
@@ -251,6 +252,14 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), prevAllowance + 3e18 - 1e18);
     }
 
+    function checkDecreaseAllowanceInsufficientAllowance(address _token, string memory _contractName) public {
+        uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
+        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
+        TokenLike(_token).decreaseAllowance(address(0xBEEF), prevAllowance + 2e18);
+    }
+
     function checkTransfer(address _token) public {
         deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
         uint256 prevSupply = TokenLike(_token).totalSupply();
@@ -264,6 +273,23 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).totalSupply(), prevSupply);
         assertEq(TokenLike(_token).balanceOf(address(this)), prevSenderBalance - 1e18);
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
+    }
+
+    function checkTransferBadAddress(address _token, string memory _contractName) public {
+        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        TokenLike(_token).transfer(address(0), 1e18);
+        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
+        TokenLike(_token).transfer(_token, 1e18);
+    }
+
+    function checkTransferInsufficientBalance(address _token, string memory _contractName) public {
+        uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
+        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 0.9e18, true);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).transfer(address(0xBEEF), prevSenderBalance + 1e18);
     }
 
     function checkTransferFrom(address _token) public {
@@ -307,23 +333,6 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
     }
 
-    function checkDecreaseAllowanceInsufficientBalance(address _token, string memory _contractName) public {
-        uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
-        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
-
-        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
-        TokenLike(_token).decreaseAllowance(address(0xBEEF), prevAllowance + 2e18);
-    }
-
-    function checkTransferBadAddress(address _token, string memory _contractName) public {
-        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
-
-        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
-        TokenLike(_token).transfer(address(0), 1e18);
-        vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
-        TokenLike(_token).transfer(_token, 1e18);
-    }
-
     function checkTransferFromBadAddress(address _token, string memory _contractName) public {
         deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
 
@@ -331,14 +340,6 @@ contract TokenChecks is DssTest {
         TokenLike(_token).transferFrom(address(this), address(0), 1e18);
         vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
         TokenLike(_token).transferFrom(address(this), address(TokenLike(_token)), 1e18);
-    }
-
-    function checkTransferInsufficientBalance(address _token, string memory _contractName) public {
-        uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
-        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 0.9e18, true);
-
-        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
-        TokenLike(_token).transfer(address(0xBEEF), prevSenderBalance + 1e18);
     }
 
     function checkTransferFromInsufficientAllowance(address _token, string memory _contractName) public {

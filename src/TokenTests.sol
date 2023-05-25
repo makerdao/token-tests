@@ -104,7 +104,7 @@ abstract contract TokenTests is TokenChecks {
     }
     function test_DecreaseAllowanceInsufficientBalance() public {
         assertVarsSet();
-        checkDecreaseAllowanceInsufficientBalance(_token_, _contractName_);
+        checkDecreaseAllowanceInsufficientAllowance(_token_, _contractName_);
     }
     function test_TransferBadAddress() public {
         assertVarsSet();
