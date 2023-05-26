@@ -130,9 +130,6 @@ contract TokenFuzzChecks is TokenChecks {
     function fuzzBulkCheckERC20(
         address _token,
         string memory _contractName,
-        string memory _symbol,
-        string memory _version,
-        uint8 _decimals,
         address to,
         uint256 amount1,
         uint256 amount2
@@ -298,7 +295,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 deadline
     ) internal {
         uint256 privateKey = privKey;
-        if (deadline < block.timestamp) deadline = block.timestamp;
+        deadline = bound(deadline, block.timestamp, type(uint256).max);
         if (privateKey == 0) privateKey = 1;
 
         address owner = vm.addr(privateKey);
@@ -331,7 +328,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 deadline,
         uint256 nonce
     ) internal {
-        if (deadline < block.timestamp) deadline = block.timestamp;
+        deadline = bound(deadline, block.timestamp, type(uint256).max);
         if (privateKey == 0) privateKey = 1;
         address owner = vm.addr(privateKey);
         if (nonce == TokenLike(_token).nonces(owner)) nonce++;
@@ -359,7 +356,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount,
         uint256 deadline
     ) internal {
-        vm.assume(deadline >= block.timestamp && deadline < type(uint256).max);
+        deadline = bound(deadline, block.timestamp, type(uint256).max - 1);
         if (privateKey == 0) privateKey = 1;
 
         address owner = vm.addr(privateKey);
@@ -388,7 +385,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount,
         uint256 deadline
     ) internal {
-        vm.assume(deadline < type(uint256).max);
+        deadline = bound(deadline, 0, block.timestamp - 1);
 
         // private key cannot be 0 for secp256k1 pubkey generation
         if (privateKey == 0) privateKey = 1;
@@ -422,7 +419,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount,
         uint256 deadline
     ) internal {
-        if (deadline < block.timestamp) deadline = block.timestamp;
+        deadline = bound(deadline, block.timestamp, type(uint256).max);
         if (privateKey == 0) privateKey = 1;
 
         address owner = vm.addr(privateKey);
