@@ -257,10 +257,10 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 allowance,
         uint256 amount
     ) internal {
-        vm.assume(to != address(0) && to != address(_token));
+        address from = address(0xABCD);
+        vm.assume(to != address(0) && to != address(_token) && to != from);
         allowance = bound(allowance, 0, type(uint256).max - 1);
         amount = bound(amount, allowance + 1, type(uint256).max);
-        address from = address(0xABCD);
         deal(_token, from, amount, true);
 
         vm.prank(from);
