@@ -111,7 +111,7 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     // ************************************************************************************************************
 
     function test_fuzzPermitEOA(
-        uint248 privKey,
+        uint128 privKey,
         address to,
         uint256 amount,
         uint256 deadline

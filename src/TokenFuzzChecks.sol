@@ -289,14 +289,13 @@ contract TokenFuzzChecks is TokenChecks {
 
     function fuzzCheckPermitEOA(
         address _token,
-        uint248 privKey,
+        uint128 privateKey,
         address to,
         uint256 amount,
         uint256 deadline
     ) internal {
-        uint256 privateKey = privKey;
         deadline = bound(deadline, block.timestamp, type(uint256).max);
-        if (privateKey == 0) privateKey = 1;
+        vm.assume(privateKey > 0);
 
         address owner = vm.addr(privateKey);
 
@@ -329,9 +328,9 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 nonce
     ) internal {
         deadline = bound(deadline, block.timestamp, type(uint256).max);
-        if (privateKey == 0) privateKey = 1;
+        vm.assume(privateKey > 0);
         address owner = vm.addr(privateKey);
-        if (nonce == TokenLike(_token).nonces(owner)) nonce++;
+        vm.assume(nonce != TokenLike(_token).nonces(owner));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
@@ -357,7 +356,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 deadline
     ) internal {
         deadline = bound(deadline, block.timestamp, type(uint256).max - 1);
-        if (privateKey == 0) privateKey = 1;
+        vm.assume(privateKey > 0);
 
         address owner = vm.addr(privateKey);
         uint256 nonce = TokenLike(_token).nonces(owner);
@@ -388,7 +387,7 @@ contract TokenFuzzChecks is TokenChecks {
         deadline = bound(deadline, 0, block.timestamp - 1);
 
         // private key cannot be 0 for secp256k1 pubkey generation
-        if (privateKey == 0) privateKey = 1;
+        vm.assume(privateKey > 0);
 
         address owner = vm.addr(privateKey);
         uint256 nonce = TokenLike(_token).nonces(owner);
@@ -420,7 +419,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 deadline
     ) internal {
         deadline = bound(deadline, block.timestamp, type(uint256).max);
-        if (privateKey == 0) privateKey = 1;
+        vm.assume(privateKey > 0);
 
         address owner = vm.addr(privateKey);
         uint256 nonce = TokenLike(_token).nonces(owner);
