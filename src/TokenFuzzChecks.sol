@@ -261,7 +261,7 @@ contract TokenFuzzChecks is TokenChecks {
         allowance = bound(allowance, 0, type(uint256).max - 1);
         amount = bound(amount, allowance + 1, type(uint256).max);
         address from = address(0xABCD);
-        deal(_token, from, TokenLike(_token).balanceOf(from) + amount, true);
+        deal(_token, from, amount, true);
 
         vm.prank(from);
         TokenLike(_token).approve(address(this), allowance);
