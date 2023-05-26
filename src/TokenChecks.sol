@@ -286,7 +286,7 @@ contract TokenChecks is DssTest {
 
     function checkTransferInsufficientBalance(address _token, string memory _contractName) public {
         uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
-        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 0.9e18, true);
+        deal(_token, address(this), prevSenderBalance + 0.9e18, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
         TokenLike(_token).transfer(address(0xBEEF), prevSenderBalance + 1e18);
