@@ -81,7 +81,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
         burnAmount = bound(burnAmount, 0, mintAmount);
-        deal(_token, from, TokenLike(_token).balanceOf(from) + mintAmount, true);
+        deal(_token, from, prevFromBalance + mintAmount, true);
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(from, address(0), burnAmount);
