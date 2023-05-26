@@ -98,12 +98,12 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 burnAmount
     ) internal {
         uint256 prevSupply = TokenLike(_token).totalSupply();
-        if(prevSupply == type(uint256).max) return;
+        if (prevSupply == type(uint256).max) return;
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         vm.assume(to != address(0) && to != _token);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
         burnAmount = bound(burnAmount, prevToBalance + mintAmount + 1, type(uint256).max);
-        deal(_token, to, TokenLike(_token).balanceOf(to) + mintAmount, true);
+        deal(_token, to, prevToBalance + mintAmount, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
         TokenLike(_token).burn(to, burnAmount);
