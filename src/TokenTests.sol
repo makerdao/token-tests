@@ -41,31 +41,31 @@ abstract contract TokenTests is TokenChecks {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function test_TokenAuth() public {
+    function testTokenAuth() public {
         assertVarsSet();
         checkTokenAuth(_token_, _contractName_);
     }
-    function test_TokenModifiers() public {
+    function testTokenModifiers() public {
         assertVarsSet();
         checkTokenModifiers(_token_, _contractName_);
     }
-    function test_Mint() public {
+    function testMint() public {
         assertVarsSet();
         checkMint(_token_);
     }
-    function test_Burn() public {
+    function testBurn() public {
         assertVarsSet();
         checkBurn(_token_);
     }
-    function test_BurnDifferentFrom() public {
+    function testBurnDifferentFrom() public {
         assertVarsSet();
         checkBurnDifferentFrom(_token_);
     }
-    function test_MintBadAddress() public {
+    function testMintBadAddress() public {
         assertVarsSet();
         checkMintBadAddress(_token_, _contractName_);
     }
-    function test_BurnInsufficientBalance() public {
+    function testBurnInsufficientBalance() public {
         assertVarsSet();
         checkBurnInsufficientBalance(_token_, _contractName_);
     }
@@ -74,55 +74,55 @@ abstract contract TokenTests is TokenChecks {
     // ERC20
     // ************************************************************************************************************
 
-    function test_Metadata() public {
+    function testMetadata() public {
         assertVarsSet();
         checkMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
     }
-    function test_Approve() public {
+    function testApprove() public {
         assertVarsSet();
         checkApprove(_token_);
     }
-    function test_IncreaseAllowance() public {
+    function testIncreaseAllowance() public {
         assertVarsSet();
         checkIncreaseAllowance(_token_);
     }
-    function test_DecreaseAllowance() public {
+    function testDecreaseAllowance() public {
         assertVarsSet();
         checkDecreaseAllowance(_token_);
     }
-    function test_Transfer() public {
+    function testTransfer() public {
         assertVarsSet();
         checkTransfer(_token_);
     }
-    function test_TransferFrom() public {
+    function testTransferFrom() public {
         assertVarsSet();
         checkTransferFrom(_token_);
     }
-    function test_InfiniteApproveTransferFrom() public {
+    function testInfiniteApproveTransferFrom() public {
         assertVarsSet();
         checkInfiniteApproveTransferFrom(_token_);
     }
-    function test_DecreaseAllowanceInsufficientAllowance() public {
+    function testDecreaseAllowanceInsufficientAllowance() public {
         assertVarsSet();
         checkDecreaseAllowanceInsufficientAllowance(_token_, _contractName_);
     }
-    function test_TransferBadAddress() public {
+    function testTransferBadAddress() public {
         assertVarsSet();
         checkTransferBadAddress(_token_, _contractName_);
     }
-    function test_TransferFromBadAddress() public {
+    function testTransferFromBadAddress() public {
         assertVarsSet();
         checkTransferFromBadAddress(_token_, _contractName_);
     }
-    function test_TransferInsufficientBalance() public {
+    function testTransferInsufficientBalance() public {
         assertVarsSet();
         checkTransferInsufficientBalance(_token_, _contractName_);
     }
-    function test_TransferFromInsufficientAllowance() public {
+    function testTransferFromInsufficientAllowance() public {
         assertVarsSet();
         checkTransferFromInsufficientAllowance(_token_, _contractName_);
     }
-    function test_TransferFromInsufficientBalance() public {
+    function testTransferFromInsufficientBalance() public {
         assertVarsSet();
         checkTransferFromInsufficientBalance(_token_, _contractName_);
     }
@@ -131,35 +131,35 @@ abstract contract TokenTests is TokenChecks {
     // Permit
     // ************************************************************************************************************
 
-    function test_PermitEOA() public {
+    function testPermitEOA() public {
         assertVarsSet();
         checkPermitEOA(_token_);
     } 
-    function test_PermitContract() public {
+    function testPermitContract() public {
         assertVarsSet();
         checkPermitContract(_token_);
     } 
-    function test_PermitContractInvalidSignature() public {
+    function testPermitContractInvalidSignature() public {
         assertVarsSet();
         checkPermitContractInvalidSignature(_token_, _contractName_);
     }
-    function test_PermitBadNonce() public {
+    function testPermitBadNonce() public {
         assertVarsSet();
         checkPermitBadNonce(_token_, _contractName_);
     } 
-    function test_PermitBadDeadline() public {
+    function testPermitBadDeadline() public {
         assertVarsSet();
         checkPermitBadDeadline(_token_, _contractName_);
     } 
-    function test_PermitPastDeadline() public {
+    function testPermitPastDeadline() public {
         assertVarsSet();
         checkPermitPastDeadline(_token_, _contractName_);
     } 
-    function test_PermitOwnerZero() public {
+    function testPermitOwnerZero() public {
         assertVarsSet();
         checkPermitOwnerZero(_token_, _contractName_);
     } 
-    function test_PermitReplay() public {
+    function testPermitReplay() public {
         assertVarsSet();
         checkPermitReplay(_token_, _contractName_);
     } 
