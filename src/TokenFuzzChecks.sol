@@ -359,8 +359,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount,
         uint256 deadline
     ) internal {
-        if (deadline == type(uint256).max) deadline -= 1;
-        if (deadline < block.timestamp) deadline = block.timestamp;
+        vm.assume(deadline >= block.timestamp && deadline < type(uint256).max);
         if (privateKey == 0) privateKey = 1;
 
         address owner = vm.addr(privateKey);
