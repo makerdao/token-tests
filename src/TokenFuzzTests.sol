@@ -25,101 +25,101 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function testFuzzMint(
+    function testMintFuzz(
         address who,
         uint256 mintAmount
     ) public {
         assertVarsSet();
-        fuzzCheckMint(_token_, _contractName_, who, mintAmount);
+        checkMintFuzz(_token_, _contractName_, who, mintAmount);
     }
-    function testFuzzBurn(
+    function testBurnFuzz(
         address who,
         uint256 mintAmount,
         uint256 burnAmount
     ) public {
         assertVarsSet();
-        fuzzCheckBurn(_token_, who, mintAmount, burnAmount);
+        checkBurnFuzz(_token_, who, mintAmount, burnAmount);
     }
-    function testFuzzBurnInsufficientBalance(
+    function testBurnInsufficientBalanceFuzz(
         address to,
         uint256 mintAmount,
         uint256 burnAmount
     ) public {
         assertVarsSet();
-        fuzzCheckBurnInsufficientBalance(_token_, _contractName_, to, mintAmount, burnAmount);
+        checkBurnInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, burnAmount);
     }
-    function testFuzzTokenModifiers(
+    function testTokenModifiersFuzz(
         address sender
     ) public {
         assertVarsSet();
-        fuzzCheckTokenModifiers(_token_, _contractName_, sender);
+        checkTokenModifiersFuzz(_token_, _contractName_, sender);
     }
 
     // ************************************************************************************************************
     // ERC20
     // ************************************************************************************************************
     
-    function testFuzzApprove(
+    function testApproveFuzz(
         address to,
         uint256 amount
     ) public {
         assertVarsSet();
-        fuzzCheckApprove(_token_, to, amount);
+        checkApproveFuzz(_token_, to, amount);
     }
-    function testFuzzTransfer(
+    function testTransferFuzz(
         address to,
         uint256 amount
     ) public {
         assertVarsSet();
-        fuzzCheckTransfer(_token_, to, amount);
+        checkTransferFuzz(_token_, to, amount);
     }
-    function testFuzzTransferFrom(
+    function testTransferFromFuzz(
         address to,
         uint256 approval,
         uint256 amount
     ) public {
         assertVarsSet();
-        fuzzCheckTransferFrom(_token_, to, approval, amount);
+        checkTransferFromFuzz(_token_, to, approval, amount);
     }
-    function testFuzzTransferInsufficientBalance(
+    function testTransferInsufficientBalanceFuzz(
         address to,
         uint256 mintAmount,
         uint256 sendAmount
     ) public {
         assertVarsSet();
-        fuzzCheckTransferInsufficientBalance(_token_, _contractName_, to, mintAmount, sendAmount);
+        checkTransferInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, sendAmount);
     }
-    function testFuzzTransferFromInsufficientBalance(
+    function testTransferFromInsufficientBalanceFuzz(
         address to,
         uint256 mintAmount,
         uint256 sendAmount
     ) public {
         assertVarsSet();
-        fuzzCheckTransferFromInsufficientBalance(_token_, _contractName_, to, mintAmount, sendAmount);
+        checkTransferFromInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, sendAmount);
     }
-    function testFuzzTransferFromInsufficientAllowance(
+    function testTransferFromInsufficientAllowanceFuzz(
         address to,
         uint256 allowance,
         uint256 amount
     ) public {
         assertVarsSet();
-        fuzzCheckTransferFromInsufficientAllowance(_token_, _contractName_, to, allowance, amount);
+        checkTransferFromInsufficientAllowanceFuzz(_token_, _contractName_, to, allowance, amount);
     }
    
     // ************************************************************************************************************
     // Permit
     // ************************************************************************************************************
 
-    function testFuzzPermitEOA(
+    function testPermitEOAFuzz(
         uint128 privKey,
         address to,
         uint256 amount,
         uint256 deadline
     ) public {
         assertVarsSet();
-        fuzzCheckPermitEOA(_token_, privKey, to, amount, deadline);
+        checkPermitEOAFuzz(_token_, privKey, to, amount, deadline);
     } 
-    function testFuzzPermitBadNonce(
+    function testPermitBadNonceFuzz(
         uint128 privKey,
         address to,
         uint256 amount,
@@ -127,34 +127,34 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         uint256 nonce
     ) public {
         assertVarsSet();
-        fuzzCheckPermitBadNonce(_token_, _contractName_, privKey, to, amount, deadline, nonce);
+        checkPermitBadNonceFuzz(_token_, _contractName_, privKey, to, amount, deadline, nonce);
     } 
-    function testFuzzPermitBadDeadline(
+    function testPermitBadDeadlineFuzz(
         uint128 privKey,
         address to,
         uint256 amount,
         uint256 deadline
     ) public {
         assertVarsSet();
-        fuzzCheckPermitBadDeadline(_token_, _contractName_, privKey, to, amount, deadline);
+        checkPermitBadDeadlineFuzz(_token_, _contractName_, privKey, to, amount, deadline);
     } 
-    function testFuzzPermitPastDeadline(
+    function testPermitPastDeadlineFuzz(
         uint128 privKey,
         address to,
         uint256 amount,
         uint256 deadline
     ) public {
         assertVarsSet();
-        fuzzCheckPermitPastDeadline(_token_, _contractName_, privKey, to, amount, deadline);
+        checkPermitPastDeadlineFuzz(_token_, _contractName_, privKey, to, amount, deadline);
     } 
-    function testFuzzPermitReplay(
+    function testPermitReplayFuzz(
         uint128 privKey,
         address to,
         uint256 amount,
         uint256 deadline
     ) public {
         assertVarsSet();
-        fuzzCheckPermitReplay(_token_, _contractName_, privKey, to, amount, deadline);
+        checkPermitReplayFuzz(_token_, _contractName_, privKey, to, amount, deadline);
     } 
 
 }

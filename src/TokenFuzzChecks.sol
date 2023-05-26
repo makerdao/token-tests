@@ -29,20 +29,20 @@ contract TokenFuzzChecks is TokenChecks {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function fuzzBulkCheckMintBurn(
+    function checkBulkMintBurnFuzz(
         address _token,
         string memory _contractName,
         address who,
         uint256 mintAmount,
         uint256 burnAmount
     ) internal {
-        fuzzCheckMint(_token, _contractName, who, mintAmount);
-        fuzzCheckBurn(_token, who, mintAmount, burnAmount);
-        fuzzCheckBurnInsufficientBalance(_token, _contractName, who, mintAmount, burnAmount);
-        fuzzCheckTokenModifiers(_token, _contractName, who);
+        checkMintFuzz(_token, _contractName, who, mintAmount);
+        checkBurnFuzz(_token, who, mintAmount, burnAmount);
+        checkBurnInsufficientBalanceFuzz(_token, _contractName, who, mintAmount, burnAmount);
+        checkTokenModifiersFuzz(_token, _contractName, who);
     }
 
-    function fuzzCheckMint(
+    function checkMintFuzz(
         address _token,
         string memory _contractName,
         address to,
@@ -69,7 +69,7 @@ contract TokenFuzzChecks is TokenChecks {
         _token.setWard(address(this), prevWard);
     }
 
-    function fuzzCheckBurn(
+    function checkBurnFuzz(
         address _token,
         address from,
         uint256 mintAmount,
@@ -90,7 +90,7 @@ contract TokenFuzzChecks is TokenChecks {
         assertEq(TokenLike(_token).balanceOf(from), prevFromBalance + mintAmount - burnAmount);
     }
 
-    function fuzzCheckBurnInsufficientBalance(
+    function checkBurnInsufficientBalanceFuzz(
         address _token,
         string memory _contractName,
         address to,
@@ -109,7 +109,7 @@ contract TokenFuzzChecks is TokenChecks {
         TokenLike(_token).burn(to, burnAmount);
     }
 
-    function fuzzCheckTokenModifiers(
+    function checkTokenModifiersFuzz(
         address _token,
         string memory _contractName,
         address sender
@@ -127,22 +127,22 @@ contract TokenFuzzChecks is TokenChecks {
     // ERC20
     // ************************************************************************************************************
 
-    function fuzzBulkCheckERC20(
+    function checkBulkERC20Fuzz(
         address _token,
         string memory _contractName,
         address to,
         uint256 amount1,
         uint256 amount2
     ) internal {
-        fuzzCheckApprove(_token, to, amount1);
-        fuzzCheckTransfer(_token, to, amount1);
-        fuzzCheckTransferFrom(_token, to, amount1, amount2);
-        fuzzCheckTransferInsufficientBalance(_token, _contractName, to, amount1, amount2);
-        fuzzCheckTransferFromInsufficientBalance(_token, _contractName, to, amount1, amount2);
-        fuzzCheckTransferFromInsufficientAllowance(_token, _contractName, to, amount1, amount2);
+        checkApproveFuzz(_token, to, amount1);
+        checkTransferFuzz(_token, to, amount1);
+        checkTransferFromFuzz(_token, to, amount1, amount2);
+        checkTransferInsufficientBalanceFuzz(_token, _contractName, to, amount1, amount2);
+        checkTransferFromInsufficientBalanceFuzz(_token, _contractName, to, amount1, amount2);
+        checkTransferFromInsufficientAllowanceFuzz(_token, _contractName, to, amount1, amount2);
     }
 
-    function fuzzCheckApprove(
+    function checkApproveFuzz(
         address _token,
         address to,
         uint256 amount
@@ -154,7 +154,7 @@ contract TokenFuzzChecks is TokenChecks {
         assertEq(TokenLike(_token).allowance(address(this), to), amount);
     }
 
-    function fuzzCheckTransfer(
+    function checkTransferFuzz(
         address _token,
         address to,
         uint256 amount
@@ -181,7 +181,7 @@ contract TokenFuzzChecks is TokenChecks {
         }
     }
 
-    function fuzzCheckTransferFrom(
+    function checkTransferFromFuzz(
         address _token,
         address to,
         uint256 approval,
@@ -214,7 +214,7 @@ contract TokenFuzzChecks is TokenChecks {
         }
     }
 
-    function fuzzCheckTransferInsufficientBalance(
+    function checkTransferInsufficientBalanceFuzz(
         address _token,
         string memory _contractName,
         address to,
@@ -233,7 +233,7 @@ contract TokenFuzzChecks is TokenChecks {
         TokenLike(_token).transfer(to, sendAmount);
     }
 
-    function fuzzCheckTransferFromInsufficientBalance(
+    function checkTransferFromInsufficientBalanceFuzz(
         address _token,
         string memory _contractName,
         address to,
@@ -254,7 +254,7 @@ contract TokenFuzzChecks is TokenChecks {
         TokenLike(_token).transferFrom(from, to, sendAmount);
     }
 
-    function fuzzCheckTransferFromInsufficientAllowance(
+    function checkTransferFromInsufficientAllowanceFuzz(
         address _token,
         string memory _contractName,
         address to,
@@ -279,7 +279,7 @@ contract TokenFuzzChecks is TokenChecks {
     // PERMIT
     // ************************************************************************************************************
 
-    function fuzzBulkCheckPermit(
+    function checkBulkPermitFuzz(
         address _token,
         string memory _contractName,
         uint128 privKey,
@@ -288,14 +288,14 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 deadline,
         uint256 nonce
     ) internal {
-        fuzzCheckPermitEOA(_token, privKey, to, amount, deadline);
-        fuzzCheckPermitBadNonce(_token, _contractName, privKey, to, amount, deadline, nonce);
-        fuzzCheckPermitBadDeadline(_token, _contractName, privKey, to, amount, deadline);
-        fuzzCheckPermitPastDeadline(_token, _contractName, privKey, to, amount, deadline);
-        fuzzCheckPermitReplay(_token, _contractName, privKey, to, amount, deadline);
+        checkPermitEOAFuzz(_token, privKey, to, amount, deadline);
+        checkPermitBadNonceFuzz(_token, _contractName, privKey, to, amount, deadline, nonce);
+        checkPermitBadDeadlineFuzz(_token, _contractName, privKey, to, amount, deadline);
+        checkPermitPastDeadlineFuzz(_token, _contractName, privKey, to, amount, deadline);
+        checkPermitReplayFuzz(_token, _contractName, privKey, to, amount, deadline);
     }
 
-    function fuzzCheckPermitEOA(
+    function checkPermitEOAFuzz(
         address _token,
         uint128 privateKey,
         address to,
@@ -326,7 +326,7 @@ contract TokenFuzzChecks is TokenChecks {
         assertEq(TokenLike(_token).nonces(owner), 1);
     }
 
-    function fuzzCheckPermitBadNonce(
+    function checkPermitBadNonceFuzz(
         address _token, 
         string memory _contractName,
         uint128 privateKey,
@@ -355,7 +355,7 @@ contract TokenFuzzChecks is TokenChecks {
         TokenLike(_token).permit(owner, to, amount, deadline, v, r, s);
     }
 
-    function fuzzCheckPermitBadDeadline(
+    function checkPermitBadDeadlineFuzz(
         address _token,
         string memory _contractName,
         uint128 privateKey,
@@ -384,7 +384,7 @@ contract TokenFuzzChecks is TokenChecks {
         TokenLike(_token).permit(owner, to, amount, deadline + 1, v, r, s);
     }
 
-    function fuzzCheckPermitPastDeadline(
+    function checkPermitPastDeadlineFuzz(
         address _token,
         string memory _contractName,
         uint128 privateKey,
@@ -416,7 +416,7 @@ contract TokenFuzzChecks is TokenChecks {
         TokenLike(_token).permit(owner, to, amount, deadline, v, r, s);
     }
 
-    function fuzzCheckPermitReplay(
+    function checkPermitReplayFuzz(
         address _token,
         string memory _contractName,
         uint128 privateKey,

@@ -31,6 +31,6 @@ You can use `tests/TokenTests.t.sol` as an example of this first approach.
 
 ### 2) Explicitely specifying your tests in your test class
 
-Alternatively, if you want more fine-grained control over your tests, you can inherit your test contract from `token-tests/TokenChecks.sol`. You will then be able to call individual token testing functions (all starting with the prefix `check`) or, alternatively, bulk testing functions such as `bulkCheckERC20()`, `bulkCheckMintBurn()` or `bulkCheckPermit()`.
+Alternatively, if you want more fine-grained control over your tests, you can inherit your test contract from `token-tests/TokenChecks.sol`. You will then be able to call individual token testing functions (all starting with the prefix `check`) or, alternatively, bulk testing functions such as `checkBulkERC20()`, `checkBulkMintBurn()` or `checkBulkPermit()`.
 
-If you wish to use fuzz testing functions to fuzz test your token, inherit your test contract from `token-tests/FuzzTokenChecks.sol`. You will then be able to call any of the token fuzz testing functions (all starting with the prefix `fuzzCheck` or `fuzzBulkCheck`).
+If you wish to use fuzz testing functions to fuzz test your token, inherit your test contract from `token-tests/FuzzTokenChecks.sol`. You will then be able to call any of the token fuzz testing functions (all in the form `checkXXXFuzz` or `checkBulkXXXFuzz`).

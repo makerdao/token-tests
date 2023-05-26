@@ -15,37 +15,37 @@ contract TokenTestsTests is TokenTests, TokenFuzzTests
         TokenLike(_token_).deny(address(this)); // this is not necessary and only done here to check that tests are not expecting the test contract to be auth
     }
 
-    function testBulkCheckMintBurn() public {
-        bulkCheckMintBurn(_token_, _contractName_);
+    function testBulkMintBurn() public {
+        checkBulkMintBurn(_token_, _contractName_);
     }
-    function testBulkCheckERC20() public {
-        bulkCheckERC20(_token_, _contractName_, _tokenName_, _symbol_, "1", 18);
+    function testBulkERC20() public {
+        checkBulkERC20(_token_, _contractName_, _tokenName_, _symbol_, "1", 18);
     }
-    function testBulkCheckPermit() public {
-        bulkCheckPermit(_token_, _contractName_);
+    function testBulkPermit() public {
+        checkBulkPermit(_token_, _contractName_);
     }
 
-    function testFuzzBulkCheckMintBurn(        
+    function testBulkMintBurnFuzz(        
         address who,
         uint256 mintAmount,
         uint256 burnAmount
     ) public {
-        fuzzBulkCheckMintBurn(_token_, _contractName_, who, mintAmount, burnAmount);
+        checkBulkMintBurnFuzz(_token_, _contractName_, who, mintAmount, burnAmount);
     }
-    function testFuzzBulkCheckERC20(
+    function testBulkERC20Fuzz(
         address to,
         uint256 amount1,
         uint256 amount2
     ) public {
-        fuzzBulkCheckERC20(_token_, _contractName_, to, amount1, amount2);
+        checkBulkERC20Fuzz(_token_, _contractName_, to, amount1, amount2);
     }
-    function testFuzzBulkCheckPermit(
+    function testBulkPermitFuzz(
         uint128 privKey,
         address to,
         uint256 amount,
         uint256 deadline,
         uint256 nonce
     ) public {
-        fuzzBulkCheckPermit(_token_, _contractName_, privKey, to, amount, deadline, nonce);
+        checkBulkPermitFuzz(_token_, _contractName_, privKey, to, amount, deadline, nonce);
     }
 }
