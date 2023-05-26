@@ -225,7 +225,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 prevSupply = TokenLike(_token).totalSupply();
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
         sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
-        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + mintAmount, true);
+        deal(_token, address(this), mintAmount, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
         TokenLike(_token).transfer(to, sendAmount);
