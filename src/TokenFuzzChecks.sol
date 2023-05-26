@@ -114,7 +114,7 @@ contract TokenFuzzChecks is TokenChecks {
         string memory _contractName,
         address sender
     ) internal {
-        vm.assume(sender != address(this));
+        vm.assume(TokenLike(_token).wards(sender) == 0);
         bytes4[] memory authedMethods = new bytes4[](1);
         authedMethods[0] = TokenLike(_token).mint.selector;
 
