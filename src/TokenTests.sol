@@ -90,9 +90,21 @@ abstract contract TokenTests is TokenChecks {
         assertVarsSet();
         checkDecreaseAllowance(_token_);
     }
+    function testDecreaseAllowanceInsufficientAllowance() public {
+        assertVarsSet();
+        checkDecreaseAllowanceInsufficientAllowance(_token_, _contractName_);
+    }
     function testTransfer() public {
         assertVarsSet();
         checkTransfer(_token_);
+    }
+    function testTransferBadAddress() public {
+        assertVarsSet();
+        checkTransferBadAddress(_token_, _contractName_);
+    }
+    function testTransferInsufficientBalance() public {
+        assertVarsSet();
+        checkTransferInsufficientBalance(_token_, _contractName_);
     }
     function testTransferFrom() public {
         assertVarsSet();
@@ -102,21 +114,9 @@ abstract contract TokenTests is TokenChecks {
         assertVarsSet();
         checkInfiniteApproveTransferFrom(_token_);
     }
-    function testDecreaseAllowanceInsufficientAllowance() public {
-        assertVarsSet();
-        checkDecreaseAllowanceInsufficientAllowance(_token_, _contractName_);
-    }
-    function testTransferBadAddress() public {
-        assertVarsSet();
-        checkTransferBadAddress(_token_, _contractName_);
-    }
     function testTransferFromBadAddress() public {
         assertVarsSet();
         checkTransferFromBadAddress(_token_, _contractName_);
-    }
-    function testTransferInsufficientBalance() public {
-        assertVarsSet();
-        checkTransferInsufficientBalance(_token_, _contractName_);
     }
     function testTransferFromInsufficientAllowance() public {
         assertVarsSet();
