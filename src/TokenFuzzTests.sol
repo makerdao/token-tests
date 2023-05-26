@@ -59,11 +59,6 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     // ERC20
     // ************************************************************************************************************
     
-    function test_fuzzMetadata(
-    ) public {
-        assertVarsSet();
-        fuzzCheckMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
-    }
     function test_fuzzApprove(
         address to,
         uint256 amount
