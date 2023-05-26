@@ -355,7 +355,7 @@ contract TokenChecks is DssTest {
     function checkTransferFromInsufficientBalance(address _token, string memory _contractName) public {
         address from = address(0xABCD);
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
-        deal(_token, from, TokenLike(_token).balanceOf(from) + 0.9e18, true);
+        deal(_token, from, prevFromBalance + 0.9e18, true);
         vm.prank(from);
         TokenLike(_token).approve(address(this), 1e18);
 
