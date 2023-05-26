@@ -35,7 +35,7 @@ contract TokenFuzzChecks is TokenChecks {
         address who,
         uint256 mintAmount,
         uint256 burnAmount
-    ) public {
+    ) internal {
         fuzzCheckMint(_token, _contractName, who, mintAmount);
         fuzzCheckBurn(_token, who, mintAmount, burnAmount);
         fuzzCheckBurnInsufficientBalance(_token, _contractName, who, mintAmount, burnAmount);
@@ -48,7 +48,7 @@ contract TokenFuzzChecks is TokenChecks {
         string memory _contractName,
         address to,
         uint256 mintAmount
-    ) public {
+    ) internal {
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
@@ -75,7 +75,7 @@ contract TokenFuzzChecks is TokenChecks {
         address from,
         uint256 mintAmount,
         uint256 burnAmount
-    ) public {
+    ) internal {
         vm.assume(from != address(0) && from != _token);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
@@ -98,7 +98,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 mintAmount,
         uint256 burnAmount
-    ) public {
+    ) internal {
         vm.assume(to != address(0) && to != _token);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
@@ -113,7 +113,7 @@ contract TokenFuzzChecks is TokenChecks {
         address _token,
         string memory _contractName,
         address sender
-    ) public {
+    ) internal {
         vm.assume(sender != address(this));
         bytes4[] memory authedMethods = new bytes4[](1);
         authedMethods[0] = TokenLike(_token).mint.selector;
@@ -136,7 +136,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount1,
         uint256 amount2
-    ) public {
+    ) internal {
         fuzzCheckMetadata(_token, _contractName, _symbol, _version, _decimals);
         fuzzCheckApprove(_token, to, amount1);
         fuzzCheckTransfer(_token, to, amount1);
@@ -152,7 +152,7 @@ contract TokenFuzzChecks is TokenChecks {
         string memory _symbol,
         string memory _version,
         uint8 _decimals
-    ) public {
+    ) internal {
         assertEq(TokenLike(_token).version(), _version); // Note that this is not part of the ERC20 standard
         assertEq(TokenLike(_token).name(), _contractName);
         assertEq(TokenLike(_token).symbol(), _symbol);
@@ -163,7 +163,7 @@ contract TokenFuzzChecks is TokenChecks {
         address _token,
         address to,
         uint256 amount
-    ) public {
+    ) internal {
         vm.expectEmit(true, true, true, true);
         emit Approval(address(this), to, amount);
         assertTrue(TokenLike(_token).approve(to, amount));
@@ -175,7 +175,7 @@ contract TokenFuzzChecks is TokenChecks {
         address _token,
         address to,
         uint256 amount
-    ) public {
+    ) internal {
         vm.assume(to != address(0) && to != _token);
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         amount = bound(amount, 0, type(uint256).max - prevToBalance);
@@ -201,7 +201,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 approval,
         uint256 amount
-    ) public {
+    ) internal {
         vm.assume(to != address(0) && to != _token);
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
         approval = bound(approval, 0, type(uint256).max - prevToBalance);
@@ -234,7 +234,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 mintAmount,
         uint256 sendAmount
-    ) public {
+    ) internal {
         vm.assume(to != address(0) && to != address(_token));
         uint256 prevSupply = TokenLike(_token).totalSupply();
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
@@ -251,7 +251,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 mintAmount,
         uint256 sendAmount
-    ) public {
+    ) internal {
         vm.assume(to != address(0) && to != address(_token));
         uint256 prevSupply = TokenLike(_token).totalSupply();
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
@@ -270,7 +270,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 allowance,
         uint256 amount
-    ) public {
+    ) internal {
         vm.assume(to != address(0) && to != address(_token));
         allowance = bound(allowance, 0, type(uint256).max - 1);
         amount = bound(amount, allowance + 1, type(uint256).max);
@@ -310,7 +310,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
+    ) internal {
         uint256 privateKey = privKey;
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
@@ -344,7 +344,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount,
         uint256 deadline,
         uint256 nonce
-    ) public {
+    ) internal {
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
         address owner = vm.addr(privateKey);
@@ -372,7 +372,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
+    ) internal {
         if (deadline == type(uint256).max) deadline -= 1;
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
@@ -402,7 +402,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
+    ) internal {
         if (deadline == type(uint256).max) deadline -= 1;
 
         // private key cannot be 0 for secp256k1 pubkey generation
@@ -436,7 +436,7 @@ contract TokenFuzzChecks is TokenChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
+    ) internal {
         if (deadline < block.timestamp) deadline = block.timestamp;
         if (privateKey == 0) privateKey = 1;
 

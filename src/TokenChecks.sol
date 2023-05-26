@@ -93,7 +93,7 @@ contract TokenChecks is DssTest {
     // Mint/Burn
     // ************************************************************************************************************
 
-    function bulkCheckMintBurn(address _token, string memory _contractName) public {
+    function bulkCheckMintBurn(address _token, string memory _contractName) internal {
         checkTokenAuth(_token, _contractName);
         checkTokenModifiers(_token, _contractName);
         checkMint(_token);
@@ -103,11 +103,11 @@ contract TokenChecks is DssTest {
         checkBurnInsufficientBalance(_token, _contractName);
     }
 
-    function checkTokenAuth(address _token, string memory _contractName) public {
+    function checkTokenAuth(address _token, string memory _contractName) internal {
         checkAuth(_token, _contractName);
     }
 
-    function checkTokenModifiers(address _token, string memory _contractName) public {
+    function checkTokenModifiers(address _token, string memory _contractName) internal {
         bytes4[] memory authedMethods = new bytes4[](1);
         authedMethods[0] = TokenLike(_token).mint.selector;
 
@@ -116,7 +116,7 @@ contract TokenChecks is DssTest {
         vm.stopPrank();
     }
 
-    function checkMint(address _token) public {
+    function checkMint(address _token) internal {
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0), address(0xBEEF), 1e18);
         uint256 prevSupply = TokenLike(_token).totalSupply();
@@ -131,7 +131,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
     }
 
-    function checkBurn(address _token) public {
+    function checkBurn(address _token) internal {
         deal(_token, address(0xBEEF), TokenLike(_token).balanceOf(address(0xBEEF)) + 1e18, true);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevTargetBalance = TokenLike(_token).balanceOf(address(0xBEEF));
@@ -145,7 +145,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevTargetBalance - 0.9e18);
     }
 
-    function checkBurnDifferentFrom(address _token) public {
+    function checkBurnDifferentFrom(address _token) internal {
         deal(_token, address(0xBEEF), TokenLike(_token).balanceOf(address(0xBEEF)) + 1e18, true);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevTargetBalance = TokenLike(_token).balanceOf(address(0xBEEF));
@@ -174,7 +174,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevTargetBalance - 0.4e18 - 0.4e18);
     }
 
-    function checkMintBadAddress(address _token, string memory _contractName) public {
+    function checkMintBadAddress(address _token, string memory _contractName) internal {
         uint256 prevWard = TokenLike(_token).wards(address(this));
         _token.setWard(address(this), 1);
 
@@ -186,7 +186,7 @@ contract TokenChecks is DssTest {
         _token.setWard(address(this), prevWard);
     }
 
-    function checkBurnInsufficientBalance(address _token, string memory _contractName) public {
+    function checkBurnInsufficientBalance(address _token, string memory _contractName) internal {
         uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
         deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 0.9e18, true);
 
@@ -198,7 +198,7 @@ contract TokenChecks is DssTest {
     // ERC20
     // ************************************************************************************************************
 
-    function bulkCheckERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
+    function bulkCheckERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) internal {
         checkMetadata(_token, _tokenName, _symbol, _version, _decimals);
         checkApprove(_token);
         checkIncreaseAllowance(_token);
@@ -214,14 +214,14 @@ contract TokenChecks is DssTest {
         checkTransferFromInsufficientBalance(_token, _contractName);
     }
 
-    function checkMetadata(address _token, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) public {
+    function checkMetadata(address _token, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) internal {
         assertEq(TokenLike(_token).version(), _version); // Note that this is not part of the ERC20 standard
         assertEq(TokenLike(_token).name(), _tokenName);
         assertEq(TokenLike(_token).symbol(), _symbol);
         assertEq(TokenLike(_token).decimals(), _decimals);
     }
 
-    function checkApprove(address _token) public {
+    function checkApprove(address _token) internal {
         vm.expectEmit(true, true, true, true);
         emit Approval(address(this), address(0xBEEF), 1e18);
 
@@ -230,7 +230,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), 1e18);
     }
 
-    function checkIncreaseAllowance(address _token) public {
+    function checkIncreaseAllowance(address _token) internal {
         assertTrue(TokenLike(_token).approve(address(0xBEEF), 0.9e18));
         uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
 
@@ -241,7 +241,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), prevAllowance + 1e18);
     }
 
-    function checkDecreaseAllowance(address _token) public {
+    function checkDecreaseAllowance(address _token) internal {
         uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
         assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 3e18));
 
@@ -252,7 +252,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), prevAllowance + 3e18 - 1e18);
     }
 
-    function checkDecreaseAllowanceInsufficientAllowance(address _token, string memory _contractName) public {
+    function checkDecreaseAllowanceInsufficientAllowance(address _token, string memory _contractName) internal {
         uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
         assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
 
@@ -260,7 +260,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).decreaseAllowance(address(0xBEEF), prevAllowance + 2e18);
     }
 
-    function checkTransfer(address _token) public {
+    function checkTransfer(address _token) internal {
         deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevRecipientBalance = TokenLike(_token).balanceOf(address(0xBEEF));
@@ -275,7 +275,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
     }
 
-    function checkTransferBadAddress(address _token, string memory _contractName) public {
+    function checkTransferBadAddress(address _token, string memory _contractName) internal {
         deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
@@ -284,7 +284,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).transfer(_token, 1e18);
     }
 
-    function checkTransferInsufficientBalance(address _token, string memory _contractName) public {
+    function checkTransferInsufficientBalance(address _token, string memory _contractName) internal {
         uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
         deal(_token, address(this), prevSenderBalance + 0.9e18, true);
 
@@ -292,7 +292,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).transfer(address(0xBEEF), prevSenderBalance + 1e18);
     }
 
-    function checkTransferFrom(address _token) public {
+    function checkTransferFrom(address _token) internal {
         address from = address(0xABCD);
         deal(_token, from, TokenLike(_token).balanceOf(address(from)) + 1e18, true);
         vm.prank(from);
@@ -312,7 +312,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
     }
 
-    function checkInfiniteApproveTransferFrom(address _token) public {
+    function checkInfiniteApproveTransferFrom(address _token) internal {
         address from = address(0xABCD);
         deal(_token, from, TokenLike(_token).balanceOf(address(from)) + 1e18, true);
         vm.prank(from);
@@ -333,7 +333,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevRecipientBalance + 1e18);
     }
 
-    function checkTransferFromBadAddress(address _token, string memory _contractName) public {
+    function checkTransferFromBadAddress(address _token, string memory _contractName) internal {
         deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + 1e18, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/invalid-address"));
@@ -342,7 +342,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).transferFrom(address(this), address(TokenLike(_token)), 1e18);
     }
 
-    function checkTransferFromInsufficientAllowance(address _token, string memory _contractName) public {
+    function checkTransferFromInsufficientAllowance(address _token, string memory _contractName) internal {
         address from = address(0xABCD);
         deal(_token, from, TokenLike(_token).balanceOf(from) + 1e18, true);
         vm.prank(from);
@@ -352,7 +352,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18);
     }
 
-    function checkTransferFromInsufficientBalance(address _token, string memory _contractName) public {
+    function checkTransferFromInsufficientBalance(address _token, string memory _contractName) internal {
         address from = address(0xABCD);
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
         deal(_token, from, prevFromBalance + 0.9e18, true);
@@ -443,7 +443,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).nonces(mockMultisig), 1);
     }
 
-    function checkPermitContractInvalidSignature(address _token, string memory _contractName) public {
+    function checkPermitContractInvalidSignature(address _token, string memory _contractName) internal {
         uint256 privateKey1 = 0xBEEF;
         address signer1 = vm.addr(privateKey1);
         uint256 privateKey2 = 0xBEEE;
@@ -478,7 +478,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).permit(mockMultisig, address(0xCAFE), 1e18, block.timestamp, signature);
     }
 
-    function checkPermitBadNonce(address _token, string memory _contractName) public {
+    function checkPermitBadNonce(address _token, string memory _contractName) internal {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
@@ -497,7 +497,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp, v, r, s);
     }
 
-    function checkPermitBadDeadline(address _token, string memory _contractName) public {
+    function checkPermitBadDeadline(address _token, string memory _contractName) internal {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
@@ -516,7 +516,7 @@ contract TokenChecks is DssTest {
         TokenLike(_token).permit(owner, address(0xCAFE), 1e18, block.timestamp + 1, v, r, s);
     }
 
-    function checkPermitPastDeadline(address _token, string memory _contractName) public {
+    function checkPermitPastDeadline(address _token, string memory _contractName) internal {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
         uint256 deadline = block.timestamp;
@@ -539,12 +539,12 @@ contract TokenChecks is DssTest {
         TokenLike(_token).permit(owner, address(0xCAFE), 1e18, deadline, v, r, s);
     }
 
-    function checkPermitOwnerZero(address _token, string memory _contractName) public {
+    function checkPermitOwnerZero(address _token, string memory _contractName) internal {
         vm.expectRevert(abi.encodePacked(_contractName, "/invalid-owner"));
         TokenLike(_token).permit(address(0), address(0xCAFE), 1e18, block.timestamp, 28, bytes32(0), bytes32(0));
     }
 
-    function checkPermitReplay(address _token, string memory _contractName) public {
+    function checkPermitReplay(address _token, string memory _contractName) internal {
         uint256 privateKey = 0xBEEF;
         address owner = vm.addr(privateKey);
 
