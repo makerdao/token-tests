@@ -24,4 +24,28 @@ contract TokenTestsTests is TokenTests, TokenFuzzTests
     function test_bulkCheckPermit() public {
         bulkCheckPermit(_token_, _contractName_);
     }
+
+    function test_fuzzBulkCheckMintBurn(        
+        address who,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public {
+        fuzzBulkCheckMintBurn(_token_, _contractName_, who, mintAmount, burnAmount);
+    }
+    function test_fuzzBulkCheckERC20(
+        address to,
+        uint256 amount1,
+        uint256 amount2
+    ) public {
+        fuzzBulkCheckERC20(_token_, _contractName_, to, amount1, amount2);
+    }
+    function test_fuzzBulkCheckPermit(
+        uint128 privKey,
+        address to,
+        uint256 amount,
+        uint256 deadline,
+        uint256 nonce
+    ) public {
+        fuzzBulkCheckPermit(_token_, _contractName_, privKey, to, amount, deadline, nonce);
+    }
 }

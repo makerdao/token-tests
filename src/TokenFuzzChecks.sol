@@ -42,7 +42,6 @@ contract TokenFuzzChecks is TokenChecks {
         fuzzCheckTokenModifiers(_token, _contractName, who);
     }
 
-
     function fuzzCheckMint(
         address _token,
         string memory _contractName,
@@ -80,13 +79,12 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply);
-        burnAmount = bound(burnAmount, 0, mintAmount);
+        burnAmount = bound(burnAmount, 0, prevFromBalance + mintAmount);
         deal(_token, from, prevFromBalance + mintAmount, true);
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(from, address(0), burnAmount);
-        vm.prank(from);
-        TokenLike(_token).burn(from, burnAmount);
+        vm.prank(from); TokenLike(_token).burn(from, burnAmount);
 
         assertEq(TokenLike(_token).totalSupply(), prevSupply + mintAmount - burnAmount);
         assertEq(TokenLike(_token).balanceOf(from), prevFromBalance + mintAmount - burnAmount);
@@ -99,10 +97,12 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 mintAmount,
         uint256 burnAmount
     ) internal {
-        vm.assume(to != address(0) && to != _token);
         uint256 prevSupply = TokenLike(_token).totalSupply();
+        if(prevSupply == type(uint256).max) return;
+        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
+        vm.assume(to != address(0) && to != _token);
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
-        burnAmount = bound(burnAmount, mintAmount + 1, type(uint256).max);
+        burnAmount = bound(burnAmount, prevToBalance + mintAmount + 1, type(uint256).max);
         deal(_token, to, TokenLike(_token).balanceOf(to) + mintAmount, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
@@ -160,11 +160,13 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount
     ) internal {
         vm.assume(to != address(0) && to != _token);
-        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
-        amount = bound(amount, 0, type(uint256).max - prevToBalance);
-        deal(_token, address(this), TokenLike(_token).balanceOf(address(this)) + amount, true);
         uint256 prevSupply = TokenLike(_token).totalSupply();
+        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
+        amount = bound(amount, 0, type(uint256).max - prevSupply);
         uint256 prevSenderBalance = TokenLike(_token).balanceOf(address(this));
+        deal(_token, address(this), prevSenderBalance + amount, true);
+        prevSenderBalance += amount;
+        prevSupply += amount;
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(this), to, amount);
@@ -186,15 +188,16 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount
     ) internal {
         vm.assume(to != address(0) && to != _token);
+        uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevToBalance = TokenLike(_token).balanceOf(to);
-        approval = bound(approval, 0, type(uint256).max - prevToBalance);
+        approval = bound(approval, 0, type(uint256).max - prevSupply);
         amount = bound(amount, 0, approval);
         address from = address(0xABCD);
-        deal(_token, from, TokenLike(_token).balanceOf(from) + amount, true);
-        uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
-        vm.prank(from);
-        TokenLike(_token).approve(address(this), approval);
+        deal(_token, from, prevFromBalance + amount, true);
+        prevFromBalance += amount;
+        prevSupply += amount;
+        vm.prank(from); TokenLike(_token).approve(address(this), approval);
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(from, to, amount);
@@ -220,9 +223,11 @@ contract TokenFuzzChecks is TokenChecks {
     ) internal {
         vm.assume(to != address(0) && to != address(_token));
         uint256 prevSupply = TokenLike(_token).totalSupply();
+        if(prevSupply == type(uint256).max) return;
+        uint256 prevBalance = TokenLike(_token).balanceOf(address(this));
         mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
-        sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
-        deal(_token, address(this), mintAmount, true);
+        sendAmount = bound(sendAmount, mintAmount + prevBalance + 1, type(uint256).max);
+        deal(_token, address(this), prevBalance + mintAmount, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
         TokenLike(_token).transfer(to, sendAmount);
@@ -237,10 +242,12 @@ contract TokenFuzzChecks is TokenChecks {
     ) internal {
         vm.assume(to != address(0) && to != address(_token));
         uint256 prevSupply = TokenLike(_token).totalSupply();
-        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
-        sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
+        if(prevSupply == type(uint256).max) return;
         address from = address(0xABCD);
-        deal(_token, from, TokenLike(_token).balanceOf(from) + mintAmount, true);
+        uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
+        mintAmount = bound(mintAmount, 0, type(uint256).max - prevSupply - 1);
+        sendAmount = bound(sendAmount, prevFromBalance + mintAmount + 1, type(uint256).max);
+        deal(_token, from, prevFromBalance + mintAmount, true);
         vm.prank(from); TokenLike(_token).approve(address(this), sendAmount);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
@@ -256,12 +263,13 @@ contract TokenFuzzChecks is TokenChecks {
     ) internal {
         address from = address(0xABCD);
         vm.assume(to != address(0) && to != address(_token) && to != from);
-        allowance = bound(allowance, 0, type(uint256).max - 1);
-        amount = bound(amount, allowance + 1, type(uint256).max);
-        deal(_token, from, amount, true);
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        if(prevSupply == type(uint256).max) return;
+        allowance = bound(allowance, 0, type(uint256).max - prevSupply - 1);
+        amount = bound(amount, allowance + 1, type(uint256).max - prevSupply);
+        deal(_token, from, TokenLike(_token).balanceOf(from) + amount, true);
 
-        vm.prank(from);
-        TokenLike(_token).approve(address(this), allowance);
+        vm.prank(from); TokenLike(_token).approve(address(this), allowance);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
         TokenLike(_token).transferFrom(from, to, amount);

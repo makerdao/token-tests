@@ -138,8 +138,7 @@ contract TokenChecks is DssTest {
 
         vm.expectEmit(true, true, true, true);
         emit Transfer(address(0xBEEF), address(0), 0.9e18);
-        vm.prank(address(0xBEEF));
-        TokenLike(_token).burn(address(0xBEEF), 0.9e18);
+        vm.prank(address(0xBEEF)); TokenLike(_token).burn(address(0xBEEF), 0.9e18);
 
         assertEq(TokenLike(_token).totalSupply(), prevSupply - 0.9e18);
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevTargetBalance - 0.9e18);
@@ -149,8 +148,7 @@ contract TokenChecks is DssTest {
         deal(_token, address(0xBEEF), TokenLike(_token).balanceOf(address(0xBEEF)) + 1e18, true);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevTargetBalance = TokenLike(_token).balanceOf(address(0xBEEF));
-        vm.prank(address(0xBEEF));
-        TokenLike(_token).approve(address(this), 0.4e18);
+        vm.prank(address(0xBEEF)); TokenLike(_token).approve(address(this), 0.4e18);
         assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), 0.4e18);
 
         vm.expectEmit(true, true, true, true);
@@ -161,8 +159,7 @@ contract TokenChecks is DssTest {
         assertEq(TokenLike(_token).totalSupply(), prevSupply - 0.4e18);
         assertEq(TokenLike(_token).balanceOf(address(0xBEEF)), prevTargetBalance - 0.4e18);
 
-        vm.prank(address(0xBEEF));
-        TokenLike(_token).approve(address(this), type(uint256).max);
+        vm.prank(address(0xBEEF)); TokenLike(_token).approve(address(this), type(uint256).max);
         assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), type(uint256).max);
 
         vm.expectEmit(true, true, true, true);
@@ -295,8 +292,7 @@ contract TokenChecks is DssTest {
     function checkTransferFrom(address _token) internal {
         address from = address(0xABCD);
         deal(_token, from, TokenLike(_token).balanceOf(address(from)) + 1e18, true);
-        vm.prank(from);
-        TokenLike(_token).approve(address(this), 1e18);
+        vm.prank(from); TokenLike(_token).approve(address(this), 1e18);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevRecipientBalance = TokenLike(_token).balanceOf(address(0xBEEF));
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
@@ -315,10 +311,9 @@ contract TokenChecks is DssTest {
     function checkInfiniteApproveTransferFrom(address _token) internal {
         address from = address(0xABCD);
         deal(_token, from, TokenLike(_token).balanceOf(address(from)) + 1e18, true);
-        vm.prank(from);
         vm.expectEmit(true, true, true, true);
         emit Approval(from, address(this), type(uint256).max);
-        TokenLike(_token).approve(address(this), type(uint256).max);
+        vm.prank(from); TokenLike(_token).approve(address(this), type(uint256).max);
         uint256 prevSupply = TokenLike(_token).totalSupply();
         uint256 prevRecipientBalance = TokenLike(_token).balanceOf(address(0xBEEF));
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
@@ -345,8 +340,7 @@ contract TokenChecks is DssTest {
     function checkTransferFromInsufficientAllowance(address _token, string memory _contractName) internal {
         address from = address(0xABCD);
         deal(_token, from, TokenLike(_token).balanceOf(from) + 1e18, true);
-        vm.prank(from);
-        TokenLike(_token).approve(address(this), 0.9e18);
+        vm.prank(from); TokenLike(_token).approve(address(this), 0.9e18);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
         TokenLike(_token).transferFrom(from, address(0xBEEF), 1e18);
@@ -356,8 +350,7 @@ contract TokenChecks is DssTest {
         address from = address(0xABCD);
         uint256 prevFromBalance = TokenLike(_token).balanceOf(from);
         deal(_token, from, prevFromBalance + 0.9e18, true);
-        vm.prank(from);
-        TokenLike(_token).approve(address(this), 1e18);
+        vm.prank(from); TokenLike(_token).approve(address(this), 1e18);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
         TokenLike(_token).transferFrom(from, address(0xBEEF), prevFromBalance + 1e18);
