@@ -412,8 +412,6 @@ contract TokenFuzzChecks is TokenChecks {
             )
         );
 
-        vm.warp(deadline + 1);
-
         vm.expectRevert(abi.encodePacked(_contractName, "/permit-expired"));
         TokenLike(_token).permit(owner, to, amount, deadline, v, r, s);
     }
