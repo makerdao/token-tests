@@ -388,7 +388,7 @@ contract TokenFuzzChecks is TokenChecks {
         uint256 amount,
         uint256 deadline
     ) internal {
-        if (deadline == type(uint256).max) deadline -= 1;
+        vm.assume(deadline < type(uint256).max);
 
         // private key cannot be 0 for secp256k1 pubkey generation
         if (privateKey == 0) privateKey = 1;
