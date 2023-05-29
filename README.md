@@ -12,7 +12,7 @@ There are two possible ways to use `token-tests`
 
 This is the recommended way. Inherit your test contract from `token-tests/TokenTests.sol` instead of `std-forge/Test.sol` (`contract YourTokenTest is TokenTests {`). You will then need to set the following inherited variables:
 
-```
+```solidity
     function setUp() public {
         _token_ = address(new YourToken());
         _contractName_ = "YourToken";
