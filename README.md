@@ -16,10 +16,8 @@ This is the recommended way. Inherit your test contract from `token-tests/TokenT
     function setUp() public {
         _token_ = address(new YourToken());
         _contractName_ = "YourToken";
-
-        _tokenName_ = "Your Token"; // this can be omitted, in which case the correctness of the token name won't be tested (not recommended)
-        _symbol_ = "TKN"; // this can be omitted, in which case the correctness of the symbol won't be tested (not recommended)
-
+        _tokenName_ = "Your Token";
+        _symbol_ = "TKN";
         _version_ = "1"; // this can be omitted, in which case a default value of "1" is assumed
         _decimals_ = 18; // this can be omitted, in which case a default value of 18 is assumed
     }

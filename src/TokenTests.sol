@@ -28,13 +28,8 @@ abstract contract TokenTests is TokenChecks {
     modifier setup {
         assertTrue(_token_ != address(0), "TokenTests/_token_ is not set");
         assertTrue(bytes(_contractName_).length > 0, "TokenTests/_contractName_ is not set");
-
-        if(bytes(_tokenName_).length == 0) {
-            _tokenName_ = TokenLike(_token_).name();
-        }
-        if(bytes(_symbol_).length == 0) {
-            _symbol_ = TokenLike(_token_).symbol();
-        }
+        assertTrue(bytes(_tokenName_).length > 0, "TokenTests/_tokenName_ is not set");
+        assertTrue(bytes(_symbol_).length > 0, "TokenTests/_symbol_ is not set");
         _;
     }
 
