@@ -28,30 +28,26 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     function testMintFuzz(
         address who,
         uint256 mintAmount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkMintFuzz(_token_, _contractName_, who, mintAmount);
     }
     function testBurnFuzz(
         address who,
         uint256 mintAmount,
         uint256 burnAmount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkBurnFuzz(_token_, who, mintAmount, burnAmount);
     }
     function testBurnInsufficientBalanceFuzz(
         address to,
         uint256 mintAmount,
         uint256 burnAmount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkBurnInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, burnAmount);
     }
     function testTokenModifiersFuzz(
         address sender
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkTokenModifiersFuzz(_token_, _contractName_, sender);
     }
 
@@ -62,47 +58,41 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     function testApproveFuzz(
         address to,
         uint256 amount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkApproveFuzz(_token_, to, amount);
     }
     function testTransferFuzz(
         address to,
         uint256 amount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkTransferFuzz(_token_, to, amount);
     }
     function testTransferFromFuzz(
         address to,
         uint256 approval,
         uint256 amount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkTransferFromFuzz(_token_, to, approval, amount);
     }
     function testTransferInsufficientBalanceFuzz(
         address to,
         uint256 mintAmount,
         uint256 sendAmount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkTransferInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, sendAmount);
     }
     function testTransferFromInsufficientBalanceFuzz(
         address to,
         uint256 mintAmount,
         uint256 sendAmount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkTransferFromInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, sendAmount);
     }
     function testTransferFromInsufficientAllowanceFuzz(
         address to,
         uint256 allowance,
         uint256 amount
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkTransferFromInsufficientAllowanceFuzz(_token_, _contractName_, to, allowance, amount);
     }
    
@@ -115,8 +105,7 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkPermitEOAFuzz(_token_, privKey, to, amount, deadline);
     } 
     function testPermitBadNonceFuzz(
@@ -125,8 +114,7 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         uint256 amount,
         uint256 deadline,
         uint256 nonce
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkPermitBadNonceFuzz(_token_, _contractName_, privKey, to, amount, deadline, nonce);
     } 
     function testPermitBadDeadlineFuzz(
@@ -134,8 +122,7 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkPermitBadDeadlineFuzz(_token_, _contractName_, privKey, to, amount, deadline);
     } 
     function testPermitPastDeadlineFuzz(
@@ -143,8 +130,7 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkPermitPastDeadlineFuzz(_token_, _contractName_, privKey, to, amount, deadline);
     } 
     function testPermitReplayFuzz(
@@ -152,8 +138,7 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         address to,
         uint256 amount,
         uint256 deadline
-    ) public {
-        assertVarsSet();
+    ) public setup {
         checkPermitReplayFuzz(_token_, _contractName_, privKey, to, amount, deadline);
     } 
 

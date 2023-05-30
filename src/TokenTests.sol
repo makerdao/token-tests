@@ -25,48 +25,42 @@ abstract contract TokenTests is TokenChecks {
     string internal _version_ = "1";
     uint8 internal _decimals_ = 18;
 
-    function assertVarsSet() internal {
+    modifier setup {
         assertTrue(_token_ != address(0), "TokenTests/_token_ is not set");
         assertTrue(bytes(_contractName_).length > 0, "TokenTests/_contractName_ is not set");
 
-        if(bytes(_tokenName_).length > 0) {
+        if(bytes(_tokenName_).length == 0) {
             _tokenName_ = TokenLike(_token_).name();
         }
-        if(bytes(_symbol_).length > 0) {
+        if(bytes(_symbol_).length == 0) {
             _symbol_ = TokenLike(_token_).symbol();
         }
+        _;
     }
 
     // ************************************************************************************************************
     // Mint/Burn
     // ************************************************************************************************************
 
-    function testTokenAuth() public {
-        assertVarsSet();
+    function testTokenAuth() public setup {
         checkTokenAuth(_token_, _contractName_);
     }
-    function testTokenModifiers() public {
-        assertVarsSet();
+    function testTokenModifiers() public setup {
         checkTokenModifiers(_token_, _contractName_);
     }
-    function testMint() public {
-        assertVarsSet();
+    function testMint() public setup {
         checkMint(_token_);
     }
-    function testBurn() public {
-        assertVarsSet();
+    function testBurn() public setup {
         checkBurn(_token_);
     }
-    function testBurnDifferentFrom() public {
-        assertVarsSet();
+    function testBurnDifferentFrom() public setup {
         checkBurnDifferentFrom(_token_);
     }
-    function testMintBadAddress() public {
-        assertVarsSet();
+    function testMintBadAddress() public setup {
         checkMintBadAddress(_token_, _contractName_);
     }
-    function testBurnInsufficientBalance() public {
-        assertVarsSet();
+    function testBurnInsufficientBalance() public setup {
         checkBurnInsufficientBalance(_token_, _contractName_);
     }
 
@@ -74,56 +68,43 @@ abstract contract TokenTests is TokenChecks {
     // ERC20
     // ************************************************************************************************************
 
-    function testMetadata() public {
-        assertVarsSet();
+    function testMetadata() public setup {
         checkMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
     }
-    function testApprove() public {
-        assertVarsSet();
+    function testApprove() public setup {
         checkApprove(_token_);
     }
-    function testIncreaseAllowance() public {
-        assertVarsSet();
+    function testIncreaseAllowance() public setup {
         checkIncreaseAllowance(_token_);
     }
-    function testDecreaseAllowance() public {
-        assertVarsSet();
+    function testDecreaseAllowance() public setup {
         checkDecreaseAllowance(_token_);
     }
-    function testDecreaseAllowanceInsufficientAllowance() public {
-        assertVarsSet();
+    function testDecreaseAllowanceInsufficientAllowance() public setup {
         checkDecreaseAllowanceInsufficientAllowance(_token_, _contractName_);
     }
-    function testTransfer() public {
-        assertVarsSet();
+    function testTransfer() public setup {
         checkTransfer(_token_);
     }
-    function testTransferBadAddress() public {
-        assertVarsSet();
+    function testTransferBadAddress() public setup {
         checkTransferBadAddress(_token_, _contractName_);
     }
-    function testTransferInsufficientBalance() public {
-        assertVarsSet();
+    function testTransferInsufficientBalance() public setup {
         checkTransferInsufficientBalance(_token_, _contractName_);
     }
-    function testTransferFrom() public {
-        assertVarsSet();
+    function testTransferFrom() public setup {
         checkTransferFrom(_token_);
     }
-    function testInfiniteApproveTransferFrom() public {
-        assertVarsSet();
+    function testInfiniteApproveTransferFrom() public setup {
         checkInfiniteApproveTransferFrom(_token_);
     }
-    function testTransferFromBadAddress() public {
-        assertVarsSet();
+    function testTransferFromBadAddress() public setup {
         checkTransferFromBadAddress(_token_, _contractName_);
     }
-    function testTransferFromInsufficientAllowance() public {
-        assertVarsSet();
+    function testTransferFromInsufficientAllowance() public setup {
         checkTransferFromInsufficientAllowance(_token_, _contractName_);
     }
-    function testTransferFromInsufficientBalance() public {
-        assertVarsSet();
+    function testTransferFromInsufficientBalance() public setup {
         checkTransferFromInsufficientBalance(_token_, _contractName_);
     }
 
@@ -131,36 +112,28 @@ abstract contract TokenTests is TokenChecks {
     // Permit
     // ************************************************************************************************************
 
-    function testPermitEOA() public {
-        assertVarsSet();
+    function testPermitEOA() public setup {
         checkPermitEOA(_token_);
     } 
-    function testPermitContract() public {
-        assertVarsSet();
+    function testPermitContract() public setup {
         checkPermitContract(_token_);
     } 
-    function testPermitContractInvalidSignature() public {
-        assertVarsSet();
+    function testPermitContractInvalidSignature() public setup {
         checkPermitContractInvalidSignature(_token_, _contractName_);
     }
-    function testPermitBadNonce() public {
-        assertVarsSet();
+    function testPermitBadNonce() public setup {
         checkPermitBadNonce(_token_, _contractName_);
     } 
-    function testPermitBadDeadline() public {
-        assertVarsSet();
+    function testPermitBadDeadline() public setup {
         checkPermitBadDeadline(_token_, _contractName_);
     } 
-    function testPermitPastDeadline() public {
-        assertVarsSet();
+    function testPermitPastDeadline() public setup {
         checkPermitPastDeadline(_token_, _contractName_);
     } 
-    function testPermitOwnerZero() public {
-        assertVarsSet();
+    function testPermitOwnerZero() public setup {
         checkPermitOwnerZero(_token_, _contractName_);
     } 
-    function testPermitReplay() public {
-        assertVarsSet();
+    function testPermitReplay() public setup {
         checkPermitReplay(_token_, _contractName_);
     } 
 }
