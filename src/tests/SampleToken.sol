@@ -142,28 +142,6 @@ contract SampleToken {
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) external returns (bool) {
-        uint256 newValue = allowance[msg.sender][spender] + addedValue;
-        allowance[msg.sender][spender] = newValue;
-
-        emit Approval(msg.sender, spender, newValue);
-
-        return true;
-    }
-
-    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool) {
-        uint256 allowed = allowance[msg.sender][spender];
-        require(allowed >= subtractedValue, "SampleToken/insufficient-allowance");
-        unchecked {
-            allowed = allowed - subtractedValue;
-        }
-        allowance[msg.sender][spender] = allowed;
-
-        emit Approval(msg.sender, spender, allowed);
-
-        return true;
-    }
-
     // --- Mint/Burn ---
     function mint(address to, uint256 value) external auth {
         require(to != address(0) && to != address(this), "SampleToken/invalid-address");

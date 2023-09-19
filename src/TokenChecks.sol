@@ -32,8 +32,6 @@ interface TokenLike {
     function approve(address, uint256) external returns (bool);
     function transfer(address, uint256) external returns (bool);
     function transferFrom(address, address, uint256) external returns (bool);
-    function increaseAllowance(address, uint256) external returns (bool);
-    function decreaseAllowance(address, uint256) external returns (bool);
     function mint(address, uint256) external;
     function burn(address, uint256) external;
     function permit(address, address, uint256, uint256, bytes memory) external;
@@ -198,12 +196,9 @@ contract TokenChecks is DssTest {
     function checkBulkERC20(address _token, string memory _contractName, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) internal {
         checkMetadata(_token, _tokenName, _symbol, _version, _decimals);
         checkApprove(_token);
-        checkIncreaseAllowance(_token);
-        checkDecreaseAllowance(_token);
         checkTransfer(_token);
         checkTransferFrom(_token);
         checkInfiniteApproveTransferFrom(_token);
-        checkDecreaseAllowanceInsufficientAllowance(_token, _contractName);
         checkTransferBadAddress(_token, _contractName);
         checkTransferFromBadAddress(_token, _contractName);
         checkTransferInsufficientBalance(_token, _contractName);
@@ -225,36 +220,6 @@ contract TokenChecks is DssTest {
         assertTrue(TokenLike(_token).approve(address(0xBEEF), 1e18));
 
         assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), 1e18);
-    }
-
-    function checkIncreaseAllowance(address _token) internal {
-        assertTrue(TokenLike(_token).approve(address(0xBEEF), 0.9e18));
-        uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
-
-        vm.expectEmit(true, true, true, true);
-        emit Approval(address(this), address(0xBEEF), prevAllowance + 1e18);
-        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
-
-        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), prevAllowance + 1e18);
-    }
-
-    function checkDecreaseAllowance(address _token) internal {
-        uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
-        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 3e18));
-
-        vm.expectEmit(true, true, true, true);
-        emit Approval(address(this), address(0xBEEF), prevAllowance + 3e18 - 1e18);
-        assertTrue(TokenLike(_token).decreaseAllowance(address(0xBEEF), 1e18));
-
-        assertEq(TokenLike(_token).allowance(address(this), address(0xBEEF)), prevAllowance + 3e18 - 1e18);
-    }
-
-    function checkDecreaseAllowanceInsufficientAllowance(address _token, string memory _contractName) internal {
-        uint256 prevAllowance = TokenLike(_token).allowance(address(this), address(0xBEEF));
-        assertTrue(TokenLike(_token).increaseAllowance(address(0xBEEF), 1e18));
-
-        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
-        TokenLike(_token).decreaseAllowance(address(0xBEEF), prevAllowance + 2e18);
     }
 
     function checkTransfer(address _token) internal {

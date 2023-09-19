@@ -69,15 +69,6 @@ abstract contract TokenTests is TokenChecks {
     function testApprove() public setup {
         checkApprove(_token_);
     }
-    function testIncreaseAllowance() public setup {
-        checkIncreaseAllowance(_token_);
-    }
-    function testDecreaseAllowance() public setup {
-        checkDecreaseAllowance(_token_);
-    }
-    function testDecreaseAllowanceInsufficientAllowance() public setup {
-        checkDecreaseAllowanceInsufficientAllowance(_token_, _contractName_);
-    }
     function testTransfer() public setup {
         checkTransfer(_token_);
     }
