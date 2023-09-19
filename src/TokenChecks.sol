@@ -514,13 +514,12 @@ contract TokenChecks is DssTest {
         address owner = vm.addr(privateKey);
         uint256 deadline = block.timestamp;
 
-        bytes32 domain_separator = TokenLike(_token).DOMAIN_SEPARATOR();
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             privateKey,
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    domain_separator,
+                    TokenLike(_token).DOMAIN_SEPARATOR(),
                     keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, 0, deadline))
                 )
             )

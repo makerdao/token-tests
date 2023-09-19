@@ -100,7 +100,7 @@ contract SampleToken {
 
         unchecked {
             balanceOf[msg.sender] = balance - value;
-            balanceOf[to] += value;
+            balanceOf[to] += value; // note: we don't need an overflow check here b/c sum of all balances == totalSupply
         }
 
         emit Transfer(msg.sender, to, value);
@@ -126,7 +126,7 @@ contract SampleToken {
 
         unchecked {
             balanceOf[from] = balance - value;
-            balanceOf[to] += value;
+            balanceOf[to] += value; // note: we don't need an overflow check here b/c sum of all balances == totalSupply
         }
 
         emit Transfer(from, to, value);
@@ -154,7 +154,7 @@ contract SampleToken {
     function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool) {
         uint256 allowed = allowance[msg.sender][spender];
         require(allowed >= subtractedValue, "SampleToken/insufficient-allowance");
-        unchecked{
+        unchecked {
             allowed = allowed - subtractedValue;
         }
         allowance[msg.sender][spender] = allowed;
@@ -203,7 +203,7 @@ contract SampleToken {
         address signer,
         bytes32 digest,
         bytes memory signature
-    ) internal view returns (bool) {
+    ) internal view returns (bool valid) {
         if (signature.length == 65) {
             bytes32 r;
             bytes32 s;
@@ -218,12 +218,14 @@ contract SampleToken {
             }
         }
 
-        (bool success, bytes memory result) = signer.staticcall(
-            abi.encodeWithSelector(IERC1271.isValidSignature.selector, digest, signature)
-        );
-        return (success &&
-            result.length == 32 &&
-            abi.decode(result, (bytes4)) == IERC1271.isValidSignature.selector);
+        if(signer.code.length > 0) {
+            (bool success, bytes memory result) = signer.staticcall(
+                abi.encodeCall(IERC1271.isValidSignature, (digest, signature))
+            );
+            valid = (success &&
+                result.length == 32 &&
+                abi.decode(result, (bytes4)) == IERC1271.isValidSignature.selector);
+        }
     }
 
     function permit(
