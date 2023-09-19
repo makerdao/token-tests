@@ -196,7 +196,7 @@ contract SampleToken {
             }
         }
 
-        if(signer.code.length > 0) {
+        if (signer.code.length > 0) {
             (bool success, bytes memory result) = signer.staticcall(
                 abi.encodeCall(IERC1271.isValidSignature, (digest, signature))
             );
