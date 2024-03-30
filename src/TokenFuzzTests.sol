@@ -45,6 +45,14 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
     ) public setup {
         checkBurnInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, burnAmount);
     }
+    function testBurnInsufficientAllowanceFuzz(
+        address to,
+        uint256 allowance,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) public setup {
+        checkBurnInsufficientAllowanceFuzz(_token_, _contractName_, to, allowance, mintAmount, burnAmount);
+    }
     function testTokenModifiersFuzz(
         address sender
     ) public setup {

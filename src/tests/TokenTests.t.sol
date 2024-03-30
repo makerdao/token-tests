@@ -27,10 +27,11 @@ contract TokenTestsTests is TokenTests, TokenFuzzTests
 
     function testBulkMintBurnFuzz(        
         address who,
+        uint256 allowance,
         uint256 mintAmount,
         uint256 burnAmount
     ) public {
-        checkBulkMintBurnFuzz(_token_, _contractName_, who, mintAmount, burnAmount);
+        checkBulkMintBurnFuzz(_token_, _contractName_, who, allowance, mintAmount, burnAmount);
     }
     function testBulkERC20Fuzz(
         address to,

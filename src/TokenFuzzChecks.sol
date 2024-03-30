@@ -33,12 +33,14 @@ contract TokenFuzzChecks is TokenChecks {
         address _token,
         string memory _contractName,
         address who,
+        uint256 allowance,
         uint256 mintAmount,
         uint256 burnAmount
     ) internal {
         checkMintFuzz(_token, _contractName, who, mintAmount);
         checkBurnFuzz(_token, who, mintAmount, burnAmount);
         checkBurnInsufficientBalanceFuzz(_token, _contractName, who, mintAmount, burnAmount);
+        checkBurnInsufficientAllowanceFuzz(_token, _contractName, who, allowance, mintAmount, burnAmount);
         checkTokenModifiersFuzz(_token, _contractName, who);
     }
 
@@ -106,6 +108,29 @@ contract TokenFuzzChecks is TokenChecks {
         deal(_token, to, prevToBalance + mintAmount, true);
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
+        TokenLike(_token).burn(to, burnAmount);
+    }
+
+    function checkBurnInsufficientAllowanceFuzz(
+        address _token,
+        string memory _contractName,
+        address to,
+        uint256 allowance,
+        uint256 mintAmount,
+        uint256 burnAmount
+    ) internal {
+        uint256 prevSupply = TokenLike(_token).totalSupply();
+        if (prevSupply == type(uint256).max) return;
+        uint256 prevToBalance = TokenLike(_token).balanceOf(to);
+        vm.assume(to != address(0) && to != _token);
+
+        mintAmount = bound(mintAmount, 1, type(uint256).max - prevSupply);
+        burnAmount = bound(burnAmount, 1, prevToBalance + mintAmount);
+        allowance = bound(allowance, 0, burnAmount - 1);
+        deal(_token, to, prevToBalance + mintAmount, true);
+        vm.prank(to); TokenLike(_token).approve(address(this), allowance);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
         TokenLike(_token).burn(to, burnAmount);
     }
 
