@@ -39,19 +39,19 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         checkBurnFuzz(_token_, who, mintAmount, burnAmount);
     }
     function testBurnInsufficientBalanceFuzz(
-        address to,
+        address from,
         uint256 mintAmount,
         uint256 burnAmount
     ) public setup {
-        checkBurnInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, burnAmount);
+        checkBurnInsufficientBalanceFuzz(_token_, _contractName_, from, mintAmount, burnAmount);
     }
     function testBurnInsufficientAllowanceFuzz(
-        address to,
+        address from,
         uint256 allowance,
         uint256 mintAmount,
         uint256 burnAmount
     ) public setup {
-        checkBurnInsufficientAllowanceFuzz(_token_, _contractName_, to, allowance, mintAmount, burnAmount);
+        checkBurnInsufficientAllowanceFuzz(_token_, _contractName_, from, allowance, mintAmount, burnAmount);
     }
     function testTokenModifiersFuzz(
         address sender
@@ -76,11 +76,12 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         checkTransferFuzz(_token_, to, amount);
     }
     function testTransferFromFuzz(
+        address from,
         address to,
         uint256 approval,
         uint256 amount
     ) public setup {
-        checkTransferFromFuzz(_token_, to, approval, amount);
+        checkTransferFromFuzz(_token_, from, to, approval, amount);
     }
     function testTransferInsufficientBalanceFuzz(
         address to,
@@ -90,18 +91,20 @@ abstract contract TokenFuzzTests is TokenTests, TokenFuzzChecks {
         checkTransferInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, sendAmount);
     }
     function testTransferFromInsufficientBalanceFuzz(
+        address from,
         address to,
         uint256 mintAmount,
         uint256 sendAmount
     ) public setup {
-        checkTransferFromInsufficientBalanceFuzz(_token_, _contractName_, to, mintAmount, sendAmount);
+        checkTransferFromInsufficientBalanceFuzz(_token_, _contractName_, from, to, mintAmount, sendAmount);
     }
     function testTransferFromInsufficientAllowanceFuzz(
+        address from,
         address to,
         uint256 allowance,
         uint256 amount
     ) public setup {
-        checkTransferFromInsufficientAllowanceFuzz(_token_, _contractName_, to, allowance, amount);
+        checkTransferFromInsufficientAllowanceFuzz(_token_, _contractName_, from, to, allowance, amount);
     }
    
     // ************************************************************************************************************
