@@ -99,6 +99,7 @@ contract TokenChecks is DssTest {
         checkBurnDifferentFrom(_token);
         checkMintBadAddress(_token, _contractName);
         checkBurnInsufficientBalance(_token, _contractName);
+        checkBurnInsufficientAllowance(_token, _contractName);
     }
 
     function checkTokenAuth(address _token, string memory _contractName) internal {
@@ -187,6 +188,16 @@ contract TokenChecks is DssTest {
 
         vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-balance"));
         TokenLike(_token).burn(address(this), prevSenderBalance + 1e18);
+    }
+
+    function checkBurnInsufficientAllowance(address _token, string memory _contractName) internal {
+        deal(_token, address(0xBEEF), TokenLike(_token).balanceOf(address(0xBEEF)) + 1e18, true);
+
+        vm.prank(address(0xBEEF)); TokenLike(_token).approve(address(this), 0.9e18);
+        assertEq(TokenLike(_token).allowance(address(0xBEEF), address(this)), 0.9e18);
+
+        vm.expectRevert(abi.encodePacked(_contractName, "/insufficient-allowance"));
+        TokenLike(_token).burn(address(0xBEEF), 1e18);
     }
 
     // ************************************************************************************************************

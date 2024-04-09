@@ -58,6 +58,9 @@ abstract contract TokenTests is TokenChecks {
     function testBurnInsufficientBalance() public setup {
         checkBurnInsufficientBalance(_token_, _contractName_);
     }
+    function testBurnInsufficientAllowance() public setup {
+        checkBurnInsufficientAllowance(_token_, _contractName_);
+    }
 
     // ************************************************************************************************************
     // ERC20
