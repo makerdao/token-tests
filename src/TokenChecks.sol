@@ -217,7 +217,7 @@ contract TokenChecks is DssTest {
         checkTransferFromInsufficientBalance(_token, _contractName);
     }
 
-    function checkMetadata(address _token, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) internal {
+    function checkMetadata(address _token, string memory _tokenName, string memory _symbol, string memory _version, uint8 _decimals) internal view {
         assertEq(TokenLike(_token).version(), _version); // Note that this is not part of the ERC20 standard
         assertEq(TokenLike(_token).name(), _tokenName);
         assertEq(TokenLike(_token).symbol(), _symbol);

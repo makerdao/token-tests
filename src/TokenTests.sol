@@ -66,7 +66,7 @@ abstract contract TokenTests is TokenChecks {
     // ERC20
     // ************************************************************************************************************
 
-    function testMetadata() public setup {
+    function testMetadata() public setup view {
         checkMetadata(_token_, _tokenName_, _symbol_, _version_, _decimals_);
     }
     function testApprove() public setup {
